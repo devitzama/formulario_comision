@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulario de Comisión</title>
+<style>
+body { font-family: Arial, sans-serif; background: #f4f6f8; display: flex; justify-content: center; align-items: center; height: 100vh; }
+.container { background: white; padding: 20px 30px; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.2); width: 400px; }
+h2 { text-align: center; margin-bottom: 20px; }
+form { display: flex; flex-direction: column; }
+label { margin-top: 10px; font-weight: bold; }
+input, select, textarea, button { margin-top: 5px; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+textarea { resize: vertical; min-height: 60px; }
+button { margin-top: 20px; background: #1976d2; color: white; cursor: pointer; font-size: 16px; border: none; }
+button:hover { background: #125ea3; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Formulario de Comisión</h2>
+  <form id="comisionForm">
+    <label>Número de oficio:</label>
+    <input type="text" name="oficio" required>
+
+    <label>Fecha:</label>
+    <input type="date" name="fecha" required>
+
+    <label>Lugar de comisión:</label>
+    <select id="lugar" name="lugar" required></select>
+
+    <label>Fecha de comisión:</label>
+    <input type="date" name="fecha_comision" required>
+
+    <label>Nombre:</label>
+    <input type="text" name="nombre" required>
+
+    <label>Puesto:</label>
+    <input type="text" name="puesto" required>
+
+    <label>Quién autoriza:</label>
+    <input type="text" name="autoriza" required>
+
+    <label>Puesto de quien autoriza:</label>
+    <input type="text" name="puesto_autoriza" required>
+
+    <label>Motivo de la comisión:</label>
+    <textarea name="motivo" required></textarea>
+
+    <button type="submit">Enviar</button>
+  </form>
+</div>
+
+<script>
+// --- CONFIGURAR AQUÍ TU URL DE GOOGLE APPS SCRIPT ---
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdqFsox-JJL2CUhqktECvKBukM1YIX-8Pg1CdU4_N2kheEWKQ4NMvWjoFsxz5dZSm4dw/exec"; // Reemplaza con tu URL
+
+// --- Municipios de Michoacán ---
+const lugares = ["Acuitzio","Aguililla","Álvaro Obregón","Angamacutiro","Angangueo","Apatzingán","Áporo","Aquila",
+"Ario","Arteaga","Briseñas","Buenavista","Carácuaro","Coahuayana","Coalcomán de Vázquez Pallares","Coeneo",
+"Cojumatlán de Régules","Contepec","Copándaro","Cotija","Cuitzeo","Charapan","Charo","Chavinda","Cherán",
+"Chilchota","Chinicuila","Chucándiro","Churintzio","Churumuco","Ecuandureo","Epitacio Huerta","Erongarícuaro",
+"Gabriel Zamora","Hidalgo","La Huacana","Huandacareo","Huaniqueo","Huetamo","Huiramba","Indaparapeo","Irimbo",
+"Ixtlán","Jacona","Jiménez","Jiquilpan","José Sixto Verduzco","Juárez","Jungapeo","Lagunillas","Lázaro Cárdenas",
+"Los Reyes","Madero","Maravatío","Marcos Castellanos","Morelia","Morelos","Múgica","Nahuatzen","Nocupétaro",
+"Nuevo Parangaricutiro","Nuevo Urecho","Numarán","Ocampo","Pajacuarán","Panindícuaro","Parácuaro","Paracho","Pátzcuaro",
+"Penjamillo","Peribán","La Piedad","Purépero","Puruándiro","Queréndaro","Quiroga","Sahuayo","San Lucas","Santa Ana Maya",
+"Salvador Escalante","Senguio","Susupuato","Tacámbaro","Tancítaro","Tangamandapio","Tangancícuaro","Tanhuato","Taretan","Tarímbaro",
+"Tepalcatepec","Tingambato","Tingüindín","Tiquicheo","Tlalpujahua","Tlazazalca","Tocumbo","Tumbiscatío","Turicato","Tuxpan",
+"Tuzantla","Tzintzuntzan","Tzitzio","Uruapan","Venustiano Carranza","Villamar","Vista Hermosa","Yurécuaro","Zacapu",
+"Zamora","Zináparo","Zinapécuaro","Ziracuaretiro","Zitácuaro"];
+
+const select = document.getElementById("lugar");
+lugares.forEach(l => {
+  const opt = document.createElement("option");
+  opt.value = l;
+  opt.textContent = l;
+  select.appendChild(opt);
+});
+
+// --- Fecha automática ---
+const hoy = new Date();
+const yyyy = hoy.getFullYear();
+const mm = String(hoy.getMonth() + 1).padStart(2,'0');
+const dd = String(hoy.getDate()).padStart(2,'0');
+const fechaActual = `${yyyy}-${mm}-${dd}`;
+document.querySelector('input[name="fecha"]').value = fechaActual;
+document.querySelector('input[name="fecha_comision"]').value = fechaActual;
+
+// --- Autocompletado global ---
+const campos = ["nombre","puesto","autoriza","puesto_autoriza","motivo"];
+campos.forEach(campo => {
+  const input = document.querySelector(`input[name="${campo}"], textarea[name="${campo}"]`);
+  const datalist = document.createElement("datalist");
+  datalist.id = campo + "_historial";
+  document.body.appendChild(datalist);
+  input.setAttribute("list", datalist.id);
+
+  fetch(`${SCRIPT_URL}?campo=${campo}`)
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(val => {
+        const opt = document.createElement("option");
+        opt.value = val;
+        datalist.appendChild(opt);
+      });
+    });
+});
+
+// --- Guardar valores al enviar ---
+document.getElementById("comisionForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  campos.forEach(campo => {
+    const input = document.querySelector(`input[name="${campo}"], textarea[name="${campo}"]`);
+    const val = input.value.trim();
+    if(!val) return;
+    fetch(SCRIPT_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({campo, valor: val})
+    });
+  });
+  alert("Formulario enviado y valores guardados en historial global.");
+  this.reset();
+  document.querySelector('input[name="fecha"]').value = fechaActual;
+  document.querySelector('input[name="fecha_comision"]').value = fechaActual;
+});
+</script>
+</body>
+</html>
