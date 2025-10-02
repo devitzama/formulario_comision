@@ -56,10 +56,10 @@
 
   <script>
     // ⚡ URL del WebApp desplegado (Apps Script)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPUuTm50w9Gk41xHlLF5iLIVB-v0lwB8Nj1PGAgxRk2Fu5R-6fTaZUrLvN1Z5DGASe4w/exec";
+    const SCRIPT_URL = "TU_URL_DEL_WEBAPP_AQUI";
 
     // ⚡ Cargar municipios desde municipios.txt
-    fetch("lugares.txt")
+    fetch("municipios.txt")
       .then(res => res.text())
       .then(text => {
         const municipios = text.split("\n").map(m => m.trim()).filter(m => m);
@@ -122,4 +122,3 @@
   </script>
 </body>
 </html>
-
