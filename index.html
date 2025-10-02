@@ -92,6 +92,7 @@ document.getElementById("fechaComision").value = hoy;
         alert("✅ Datos guardados en el historial");
         e.target.reset();
         document.getElementById("fechaActual").value = new Date().toISOString().split("T")[0];
+        document.getElementById("fechaComision").value = new Date().toISOString().split("T")[0];
         cargarHistorial(); // refrescar historial
       })
       .catch(err => alert("❌ Error: " + err));
@@ -125,6 +126,7 @@ document.getElementById("fechaComision").value = hoy;
   </script>
 </body>
 </html>
+
 
 
 
