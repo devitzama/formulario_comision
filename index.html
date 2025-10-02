@@ -4,17 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Formulario de Comisión</title>
-<style>
-body { font-family: Arial, sans-serif; background: #f4f6f8; display: flex; justify-content: center; align-items: center; height: 100vh; }
-.container { background: white; padding: 20px 30px; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.2); width: 400px; }
-h2 { text-align: center; margin-bottom: 20px; }
-form { display: flex; flex-direction: column; }
-label { margin-top: 10px; font-weight: bold; }
-input, select, textarea, button { margin-top: 5px; padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
-textarea { resize: vertical; min-height: 60px; }
-button { margin-top: 20px; background: #1976d2; color: white; cursor: pointer; font-size: 16px; border: none; }
-button:hover { background: #125ea3; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="container">
@@ -52,10 +42,10 @@ button:hover { background: #125ea3; }
 </div>
 
 <script>
-// --- CONFIGURAR AQUÍ TU URL DE GOOGLE APPS SCRIPT ---
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPUuTm50w9Gk41xHlLF5iLIVB-v0lwB8Nj1PGAgxRk2Fu5R-6fTaZUrLvN1Z5DGASe4w/exec"; // Reemplaza con tu URL
+// ---------------- CONFIGURAR TU URL DE APPS SCRIPT ----------------
+const SCRIPT_URL = "TU_URL_DE_APLICACION_WEB"; // ENTRE COMILLAS
 
-// --- Municipios de Michoacán ---
+// ---------------- PICKER DE MUNICIPIOS DE MICHOACÁN ----------------
 const lugares = ["Acuitzio","Aguililla","Álvaro Obregón","Angamacutiro","Angangueo","Apatzingán","Áporo","Aquila",
 "Ario","Arteaga","Briseñas","Buenavista","Carácuaro","Coahuayana","Coalcomán de Vázquez Pallares","Coeneo",
 "Cojumatlán de Régules","Contepec","Copándaro","Cotija","Cuitzeo","Charapan","Charo","Chavinda","Cherán",
@@ -78,7 +68,7 @@ lugares.forEach(l => {
   select.appendChild(opt);
 });
 
-// --- Fecha automática ---
+// ---------------- FECHA AUTOMÁTICA ----------------
 const hoy = new Date();
 const yyyy = hoy.getFullYear();
 const mm = String(hoy.getMonth() + 1).padStart(2,'0');
@@ -87,7 +77,7 @@ const fechaActual = `${yyyy}-${mm}-${dd}`;
 document.querySelector('input[name="fecha"]').value = fechaActual;
 document.querySelector('input[name="fecha_comision"]').value = fechaActual;
 
-// --- Autocompletado global ---
+// ---------------- AUTOCOMPLETADO GLOBAL ----------------
 const campos = ["nombre","puesto","autoriza","puesto_autoriza","motivo"];
 campos.forEach(campo => {
   const input = document.querySelector(`input[name="${campo}"], textarea[name="${campo}"]`);
@@ -96,6 +86,7 @@ campos.forEach(campo => {
   document.body.appendChild(datalist);
   input.setAttribute("list", datalist.id);
 
+  // Obtener historial desde Apps Script
   fetch(`${SCRIPT_URL}?campo=${campo}`)
     .then(res => res.json())
     .then(data => {
@@ -107,19 +98,24 @@ campos.forEach(campo => {
     });
 });
 
-// --- Guardar valores al enviar ---
+// ---------------- GUARDAR DATOS EN GOOGLE SHEETS ----------------
 document.getElementById("comisionForm").addEventListener("submit", function(e){
   e.preventDefault();
+
   campos.forEach(campo => {
     const input = document.querySelector(`input[name="${campo}"], textarea[name="${campo}"]`);
     const val = input.value.trim();
     if(!val) return;
+
     fetch(SCRIPT_URL, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({campo, valor: val})
-    });
+      body: JSON.stringify({campo: campo, valor: val})
+    })
+    .then(res => res.json())
+    .then(data => console.log(data));
   });
+
   alert("Formulario enviado y valores guardados en historial global.");
   this.reset();
   document.querySelector('input[name="fecha"]').value = fechaActual;
@@ -128,7 +124,3 @@ document.getElementById("comisionForm").addEventListener("submit", function(e){
 </script>
 </body>
 </html>
-
-
-
-
