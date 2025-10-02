@@ -73,7 +73,10 @@
       });
 
     // ⚡ Fecha actual en campo de fecha
-    document.getElementById("fechaActual").value = new Date().toISOString().split("T")[0];
+    const hoy = new Date().toISOString().split("T")[0];
+document.getElementById("fechaActual").value = hoy;
+document.querySelector('input[name="fechaComision"]').value = hoy;
+
 
     // ⚡ Envío del formulario
     document.getElementById("comisionForm").addEventListener("submit", e => {
@@ -122,4 +125,5 @@
   </script>
 </body>
 </html>
+
 
