@@ -1,127 +1,124 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formulario de Comisión</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Formulario de Comisión</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background: #f4f6f9; }
+    form { background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto;
+           box-shadow: 0px 2px 8px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
+    button { margin-top: 20px; padding: 12px; width: 100%; background: #1976d2; color: white; border: none;
+             border-radius: 5px; font-size: 16px; cursor: pointer; }
+    button:hover { background: #1565c0; }
+  </style>
 </head>
 <body>
-<div class="container">
   <h2>Formulario de Comisión</h2>
   <form id="comisionForm">
-    <label>Número de oficio:</label>
-    <input type="text" name="oficio" required>
+    <label>Número de Oficio</label>
+    <input type="text" name="numeroOficio" required list="historialOficio">
+    <datalist id="historialOficio"></datalist>
 
-    <label>Fecha:</label>
-    <input type="date" name="fecha" required>
+    <label>Fecha</label>
+    <input type="date" name="fecha" id="fechaActual" required>
 
-    <label>Lugar de comisión:</label>
-    <select id="lugar" name="lugar" required></select>
+    <label>Lugar de Comisión</label>
+    <select name="lugar" id="lugarSelect" required>
+      <option value="">-- Selecciona un lugar --</option>
+    </select>
 
-    <label>Fecha de comisión:</label>
-    <input type="date" name="fecha_comision" required>
+    <label>Fecha de Comisión</label>
+    <input type="date" name="fechaComision" required>
 
-    <label>Nombre:</label>
-    <input type="text" name="nombre" required>
+    <label>Nombre</label>
+    <input type="text" name="nombre" required list="historialNombre">
+    <datalist id="historialNombre"></datalist>
 
-    <label>Puesto:</label>
-    <input type="text" name="puesto" required>
+    <label>Puesto</label>
+    <input type="text" name="puesto" required list="historialPuesto">
+    <datalist id="historialPuesto"></datalist>
 
-    <label>Quién autoriza:</label>
-    <input type="text" name="autoriza" required>
+    <label>Quién Autoriza</label>
+    <input type="text" name="autoriza" required list="historialAutoriza">
+    <datalist id="historialAutoriza"></datalist>
 
-    <label>Puesto de quien autoriza:</label>
-    <input type="text" name="puesto_autoriza" required>
+    <label>Puesto de Quién Autoriza</label>
+    <input type="text" name="puestoAutoriza" required list="historialPuestoAutoriza">
+    <datalist id="historialPuestoAutoriza"></datalist>
 
-    <label>Motivo de la comisión:</label>
-    <textarea name="motivo" required></textarea>
+    <label>Motivo de Comisión</label>
+    <textarea name="motivo" rows="3" required></textarea>
 
     <button type="submit">Enviar</button>
   </form>
-</div>
 
-<script>
-// ---------------- CONFIGURAR TU URL DE APPS SCRIPT ----------------
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPUuTm50w9Gk41xHlLF5iLIVB-v0lwB8Nj1PGAgxRk2Fu5R-6fTaZUrLvN1Z5DGASe4w/exec"; // ENTRE COMILLAS
+  <script>
+    // ⚡ URL del WebApp desplegado (Apps Script)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPUuTm50w9Gk41xHlLF5iLIVB-v0lwB8Nj1PGAgxRk2Fu5R-6fTaZUrLvN1Z5DGASe4w/exec";
 
-// ---------------- PICKER DE MUNICIPIOS DE MICHOACÁN ----------------
-const lugares = ["Acuitzio","Aguililla","Álvaro Obregón","Angamacutiro","Angangueo","Apatzingán","Áporo","Aquila",
-"Ario","Arteaga","Briseñas","Buenavista","Carácuaro","Coahuayana","Coalcomán de Vázquez Pallares","Coeneo",
-"Cojumatlán de Régules","Contepec","Copándaro","Cotija","Cuitzeo","Charapan","Charo","Chavinda","Cherán",
-"Chilchota","Chinicuila","Chucándiro","Churintzio","Churumuco","Ecuandureo","Epitacio Huerta","Erongarícuaro",
-"Gabriel Zamora","Hidalgo","La Huacana","Huandacareo","Huaniqueo","Huetamo","Huiramba","Indaparapeo","Irimbo",
-"Ixtlán","Jacona","Jiménez","Jiquilpan","José Sixto Verduzco","Juárez","Jungapeo","Lagunillas","Lázaro Cárdenas",
-"Los Reyes","Madero","Maravatío","Marcos Castellanos","Morelia","Morelos","Múgica","Nahuatzen","Nocupétaro",
-"Nuevo Parangaricutiro","Nuevo Urecho","Numarán","Ocampo","Pajacuarán","Panindícuaro","Parácuaro","Paracho","Pátzcuaro",
-"Penjamillo","Peribán","La Piedad","Purépero","Puruándiro","Queréndaro","Quiroga","Sahuayo","San Lucas","Santa Ana Maya",
-"Salvador Escalante","Senguio","Susupuato","Tacámbaro","Tancítaro","Tangamandapio","Tangancícuaro","Tanhuato","Taretan","Tarímbaro",
-"Tepalcatepec","Tingambato","Tingüindín","Tiquicheo","Tlalpujahua","Tlazazalca","Tocumbo","Tumbiscatío","Turicato","Tuxpan",
-"Tuzantla","Tzintzuntzan","Tzitzio","Uruapan","Venustiano Carranza","Villamar","Vista Hermosa","Yurécuaro","Zacapu",
-"Zamora","Zináparo","Zinapécuaro","Ziracuaretiro","Zitácuaro"];
+    // ⚡ Cargar municipios desde municipios.txt
+    fetch("municipios.txt")
+      .then(res => res.text())
+      .then(text => {
+        const municipios = text.split("\n").map(m => m.trim()).filter(m => m);
+        const select = document.getElementById("lugarSelect");
+        municipios.forEach(m => {
+          let opt = document.createElement("option");
+          opt.value = m;
+          opt.textContent = m;
+          select.appendChild(opt);
+        });
+      });
 
-const select = document.getElementById("lugar");
-lugares.forEach(l => {
-  const opt = document.createElement("option");
-  opt.value = l;
-  opt.textContent = l;
-  select.appendChild(opt);
-});
+    // ⚡ Fecha actual en campo de fecha
+    document.getElementById("fechaActual").value = new Date().toISOString().split("T")[0];
 
-// ---------------- FECHA AUTOMÁTICA ----------------
-const hoy = new Date();
-const yyyy = hoy.getFullYear();
-const mm = String(hoy.getMonth() + 1).padStart(2,'0');
-const dd = String(hoy.getDate()).padStart(2,'0');
-const fechaActual = `${yyyy}-${mm}-${dd}`;
-document.querySelector('input[name="fecha"]').value = fechaActual;
-document.querySelector('input[name="fecha_comision"]').value = fechaActual;
+    // ⚡ Envío del formulario
+    document.getElementById("comisionForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
 
-// ---------------- AUTOCOMPLETADO GLOBAL ----------------
-const campos = ["nombre","puesto","autoriza","puesto_autoriza","motivo"];
-campos.forEach(campo => {
-  const input = document.querySelector(`input[name="${campo}"], textarea[name="${campo}"]`);
-  const datalist = document.createElement("datalist");
-  datalist.id = campo + "_historial";
-  document.body.appendChild(datalist);
-  input.setAttribute("list", datalist.id);
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(data)
+      })
+      .then(res => res.text())
+      .then(txt => {
+        alert("✅ Datos guardados en el historial");
+        e.target.reset();
+        document.getElementById("fechaActual").value = new Date().toISOString().split("T")[0];
+        cargarHistorial(); // refrescar historial
+      })
+      .catch(err => alert("❌ Error: " + err));
+    });
 
-  // Obtener historial desde Apps Script
-  fetch(`${SCRIPT_URL}?campo=${campo}`)
-    .then(res => res.json())
-    .then(data => {
-      data.forEach(val => {
-        const opt = document.createElement("option");
-        opt.value = val;
+    // ⚡ Cargar historial desde Google Sheets
+    function cargarHistorial() {
+      fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+          llenarDatalist("historialOficio", [...new Set(data.map(d => d.numeroOficio))]);
+          llenarDatalist("historialNombre", [...new Set(data.map(d => d.nombre))]);
+          llenarDatalist("historialPuesto", [...new Set(data.map(d => d.puesto))]);
+          llenarDatalist("historialAutoriza", [...new Set(data.map(d => d.autoriza))]);
+          llenarDatalist("historialPuestoAutoriza", [...new Set(data.map(d => d.puestoAutoriza))]);
+        });
+    }
+
+    function llenarDatalist(id, valores) {
+      const datalist = document.getElementById(id);
+      datalist.innerHTML = "";
+      valores.forEach(v => {
+        let opt = document.createElement("option");
+        opt.value = v;
         datalist.appendChild(opt);
       });
-    });
-});
+    }
 
-// ---------------- GUARDAR DATOS EN GOOGLE SHEETS ----------------
-document.getElementById("comisionForm").addEventListener("submit", function(e){
-  e.preventDefault();
-
-  campos.forEach(campo => {
-    const input = document.querySelector(`input[name="${campo}"], textarea[name="${campo}"]`);
-    const val = input.value.trim();
-    if(!val) return;
-
-    fetch(SCRIPT_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({campo: campo, valor: val})
-    })
-    .then(res => res.json())
-    .then(data => console.log(data));
-  });
-
-  alert("Formulario enviado y valores guardados en historial global.");
-  this.reset();
-  document.querySelector('input[name="fecha"]').value = fechaActual;
-  document.querySelector('input[name="fecha_comision"]').value = fechaActual;
-});
-</script>
+    // ⚡ Cargar historial al iniciar
+    cargarHistorial();
+  </script>
 </body>
 </html>
-
