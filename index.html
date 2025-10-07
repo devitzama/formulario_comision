@@ -56,7 +56,7 @@
 
   <script>
     // ⚡ URL del WebApp desplegado (Apps Script)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdqFsox-JJL2CUhqktECvKBukM1YIX-8Pg1CdU4_N2kheEWKQ4NMvWjoFsxz5dZSm4dw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZ5XDxo_vbKGHS-ATy-PIfx6R4WzYzo5Llar1qHUmWuvBDRu0V0X3SJbQhYxwgpy5rqQ/exec";
 
     // ⚡ Cargar municipios desde municipios.txt
     fetch("municipios.txt")
@@ -78,47 +78,58 @@ document.getElementById("fechaActual").value = hoy;
 document.getElementById("fechaComision").value = hoy;
 
 
-    // ⚡ Envío del formulario
+  // Guardar datos en Google Sheets
     document.getElementById("comisionForm").addEventListener("submit", e => {
       e.preventDefault();
-      const data = Object.fromEntries(new FormData(e.target));
-
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify(data)
-      })
-      .then(res => res.text())
-      .then(txt => {
-        alert("✅ Datos guardados en el historial");
-        e.target.reset();
-        document.getElementById("fechaActual").value = new Date().toISOString().split("T")[0];
-        document.getElementById("fechaComision").value = new Date().toISOString().split("T")[0];
-        cargarHistorial(); // refrescar historial
-      })
-      .catch(err => alert("❌ Error: " + err));
+      const formData = new FormData(e.target);
+      fetch(SCRIPT_URL, { method: "POST", body: formData })
+        .then(res => res.text())
+        .then(() => {
+          alert("✅ Datos guardados");
+          e.target.reset();
+          document.getElementById("fechaActual").value = hoy;
+          document.getElementById("fechaComision").value = hoy;
+          cargarHistorial(); // recarga historial
+        })
+        .catch(err => alert("Error: " + err));
     });
 
-    // ⚡ Cargar historial desde Google Sheets
+    // Mostrar historial
     function cargarHistorial() {
       fetch(SCRIPT_URL)
         .then(res => res.json())
         .then(data => {
-          llenarDatalist("historialOficio", [...new Set(data.map(d => d.numeroOficio))]);
-          llenarDatalist("historialNombre", [...new Set(data.map(d => d.nombre))]);
-          llenarDatalist("historialPuesto", [...new Set(data.map(d => d.puesto))]);
-          llenarDatalist("historialAutoriza", [...new Set(data.map(d => d.autoriza))]);
-          llenarDatalist("historialPuestoAutoriza", [...new Set(data.map(d => d.puestoAutoriza))]);
-        });
-    }
+          const thead = document.querySelector("#historialTable thead");
+          const tbody = document.querySelector("#historialTable tbody");
+          thead.innerHTML = "";
+          tbody.innerHTML = "";
 
-    function llenarDatalist(id, valores) {
-      const datalist = document.getElementById(id);
-      datalist.innerHTML = "";
-      valores.forEach(v => {
-        let opt = document.createElement("option");
-        opt.value = v;
-        datalist.appendChild(opt);
-      });
+          if (data.length > 0) {
+            // encabezados
+            const headers = Object.keys(data[0]);
+            const trHead = document.createElement("tr");
+            headers.forEach(h => {
+              const th = document.createElement("th");
+              th.textContent = h;
+              trHead.appendChild(th);
+            });
+            thead.appendChild(trHead);
+
+            // filas
+            data.forEach(row => {
+              const tr = document.createElement("tr");
+              headers.forEach(h => {
+                const td = document.createElement("td");
+                td.textContent = row[h] || "";
+                tr.appendChild(td);
+              });
+              tbody.appendChild(tr);
+            });
+          } else {
+            tbody.innerHTML = "<tr><td colspan='10'>Sin registros aún</td></tr>";
+          }
+        })
+        .catch(err => console.error("Error al cargar historial:", err));
     }
 
     // ⚡ Cargar historial al iniciar
@@ -126,6 +137,7 @@ document.getElementById("fechaComision").value = hoy;
   </script>
 </body>
 </html>
+
 
 
 
