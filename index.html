@@ -177,6 +177,7 @@
         .then(response => response.json())
         .then(data => {
           const tabla = document.getElementById("tablaHistorial");
+          const nombreSug = document.getElementById("nombre");
           tabla.innerHTML = "";
           if (data.length === 0) {
             tabla.innerHTML = "<tr><td colspan='10'>No hay registros</td></tr>";
@@ -198,6 +199,11 @@
             `;
             tabla.appendChild(tr);
           });
+          data.forEach(fila =>{
+              const option = document.crateElement('option');
+              option.value = fila.nombre;
+              nombreSug.appendChild(option);
+          });
         })
         .catch(err => console.error("Error al cargar historial:", err));
     }
@@ -206,6 +212,7 @@
 
 </body>
 </html>
+
 
 
 
