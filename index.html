@@ -164,8 +164,8 @@
         .then(() => {
           alert("✅ Datos guardados correctamente");
           this.reset();
-          document.getElementById("fechaActual").value = hoy;
-          document.getElementById("fechaComision").value = hoy;
+          document.getElementById("fechaActual").value = fechaISO;
+          document.getElementById("fechaComision").value = fechaISO;
           cargarHistorial();
         })
         .catch(err => alert("❌ Error al guardar: " + err.message));
@@ -206,6 +206,7 @@
 
 </body>
 </html>
+
 
 
 
