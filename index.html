@@ -2,144 +2,207 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Formulario de Comisión</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background: #f4f6f9; }
-    form { background: #fff; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto;
-           box-shadow: 0px 2px 8px rgba(0,0,0,0.1); }
-    label { display: block; margin-top: 15px; font-weight: bold; }
-    input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
-    button { margin-top: 20px; padding: 12px; width: 100%; background: #1976d2; color: white; border: none;
-             border-radius: 5px; font-size: 16px; cursor: pointer; }
-    button:hover { background: #1565c0; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background: #f4f6f8;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 700px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 40px;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <h2>Formulario de Comisión</h2>
+
+  <h1>Formulario de Comisión</h1>
+
   <form id="comisionForm">
-    <label>Número de Oficio</label>
-    <input type="text" name="numeroOficio" required list="historialOficio">
-    <datalist id="historialOficio"></datalist>
+    <label>Número de Oficio:</label>
+    <input type="text" id="oficio" name="oficio" required>
 
-    <label>Fecha Oficio</label>
-    <input type="date" name="fecha" id="fechaActual" required>
+    <label>Fecha:</label>
+    <input type="date" id="fechaActual" name="fecha" required>
 
-    <label>Lugar de Comisión</label>
-    <select name="lugar" id="lugarSelect" required>
-      <option value="">-- Selecciona un lugar --</option>
+    <label>Lugar de Comisión:</label>
+    <select id="lugarComision" name="lugarComision" required>
+      <option value="">Cargando municipios...</option>
     </select>
 
-    <label>Fecha de Comisión</label>
-    <input type="date" name="fechaC" id="fechaComision" required>
+    <label>Fecha de Comisión:</label>
+    <input type="date" id="fechaComision" name="fechaComision" required>
 
-    <label>Nombre</label>
-    <input type="text" name="nombre" required list="historialNombre">
-    <datalist id="historialNombre"></datalist>
+    <label>Nombre:</label>
+    <input type="text" id="nombre" name="nombre" required>
 
-    <label>Puesto</label>
-    <input type="text" name="puesto" required list="historialPuesto">
-    <datalist id="historialPuesto"></datalist>
+    <label>Puesto:</label>
+    <input type="text" id="puesto" name="puesto" required>
 
-    <label>Quién Autoriza</label>
-    <input type="text" name="autoriza" required list="historialAutoriza">
-    <datalist id="historialAutoriza"></datalist>
+    <label>Quién autoriza:</label>
+    <input type="text" id="autoriza" name="autoriza" required>
 
-    <label>Puesto de Quién Autoriza</label>
-    <input type="text" name="puestoAutoriza" required list="historialPuestoAutoriza">
-    <datalist id="historialPuestoAutoriza"></datalist>
+    <label>Puesto de quien autoriza:</label>
+    <input type="text" id="puestoAutoriza" name="puestoAutoriza" required>
 
-    <label>Motivo de Comisión</label>
-    <textarea name="motivo" rows="3" required></textarea>
+    <label>Motivo de la comisión:</label>
+    <textarea id="motivo" name="motivo" rows="3" required></textarea>
 
-    <button type="submit">Enviar</button>
+    <button type="submit">Guardar</button>
   </form>
 
-  <script>
-    // ⚡ URL del WebApp desplegado (Apps Script)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZ5XDxo_vbKGHS-ATy-PIfx6R4WzYzo5Llar1qHUmWuvBDRu0V0X3SJbQhYxwgpy5rqQ/exec";
+  <h2>Historial de Comisiones</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Número de Oficio</th>
+        <th>Fecha</th>
+        <th>Lugar de Comisión</th>
+        <th>Fecha de Comisión</th>
+        <th>Nombre</th>
+        <th>Puesto</th>
+        <th>Autoriza</th>
+        <th>Puesto Autoriza</th>
+        <th>Motivo</th>
+        <th>Marca de Tiempo</th>
+      </tr>
+    </thead>
+    <tbody id="tablaHistorial"></tbody>
+  </table>
 
-    // ⚡ Cargar municipios desde municipios.txt
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // ⚙️ Cambia esta URL por tu Apps Script publicado
+    const scriptURL = "https://script.google.com/macros/s/TU_SCRIPT_ID/exec";
+
+    // 📅 Fecha actual automática
+    const hoy = new Date().toISOString().split("T")[0];
+    document.getElementById("fechaActual").value = hoy;
+    document.getElementById("fechaComision").value = hoy;
+
+    // 🏙 Cargar municipios desde municipios.txt
     fetch("municipios.txt")
-      .then(res => res.text())
+      .then(response => response.text())
       .then(text => {
         const municipios = text.split("\n").map(m => m.trim()).filter(m => m);
-        const select = document.getElementById("lugarSelect");
-        municipios.forEach(m => {
-          let opt = document.createElement("option");
-          opt.value = m;
-          opt.textContent = m;
-          select.appendChild(opt);
+        const select = document.getElementById("lugarComision");
+        select.innerHTML = "<option value=''>Seleccione un municipio</option>";
+        municipios.forEach(nombre => {
+          const option = document.createElement("option");
+          option.textContent = nombre;
+          option.value = nombre;
+          select.appendChild(option);
         });
+      })
+      .catch(err => {
+        console.error("Error cargando municipios:", err);
+        document.getElementById("lugarComision").innerHTML =
+          "<option>Error al cargar municipios</option>";
       });
 
-    // ⚡ Fecha actual en campo de fecha
-    const hoy = new Date().toISOString().split("T")[0];
-document.getElementById("fechaActual").value = hoy;
-document.getElementById("fechaComision").value = hoy;
+    // 📥 Cargar historial al inicio
+    cargarHistorial();
 
-
-  // Guardar datos en Google Sheets
-    document.getElementById("comisionForm").addEventListener("submit", e => {
+    // 📨 Envío del formulario a Google Sheets
+    document.getElementById("comisionForm").addEventListener("submit", function(e) {
       e.preventDefault();
-      const formData = new FormData(e.target);
-      fetch(SCRIPT_URL, { method: "POST", body: formData })
-        .then(res => res.text())
+      const formData = new FormData(this);
+      fetch(scriptURL, { method: "POST", body: formData })
         .then(() => {
-          alert("✅ Datos guardados");
-          e.target.reset();
+          alert("✅ Datos guardados correctamente");
+          this.reset();
           document.getElementById("fechaActual").value = hoy;
           document.getElementById("fechaComision").value = hoy;
-          cargarHistorial(); // recarga historial
+          cargarHistorial();
         })
-        .catch(err => alert("Error: " + err));
+        .catch(err => alert("❌ Error al guardar: " + err.message));
     });
 
-    // Mostrar historial
+    // 📄 Función para mostrar historial desde Google Sheets
     function cargarHistorial() {
-      fetch(SCRIPT_URL)
-        .then(res => res.json())
+      fetch(scriptURL)
+        .then(response => response.json())
         .then(data => {
-          const thead = document.querySelector("#historialTable thead");
-          const tbody = document.querySelector("#historialTable tbody");
-          thead.innerHTML = "";
-          tbody.innerHTML = "";
-
-          if (data.length > 0) {
-            // encabezados
-            const headers = Object.keys(data[0]);
-            const trHead = document.createElement("tr");
-            headers.forEach(h => {
-              const th = document.createElement("th");
-              th.textContent = h;
-              trHead.appendChild(th);
-            });
-            thead.appendChild(trHead);
-
-            // filas
-            data.forEach(row => {
-              const tr = document.createElement("tr");
-              headers.forEach(h => {
-                const td = document.createElement("td");
-                td.textContent = row[h] || "";
-                tr.appendChild(td);
-              });
-              tbody.appendChild(tr);
-            });
-          } else {
-            tbody.innerHTML = "<tr><td colspan='10'>Sin registros aún</td></tr>";
+          const tabla = document.getElementById("tablaHistorial");
+          tabla.innerHTML = "";
+          if (data.length === 0) {
+            tabla.innerHTML = "<tr><td colspan='10'>No hay registros</td></tr>";
+            return;
           }
+          data.forEach(fila => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${fila["Número de Oficio"] || ""}</td>
+              <td>${fila["Fecha"] || ""}</td>
+              <td>${fila["Lugar de Comisión"] || ""}</td>
+              <td>${fila["Fecha de Comisión"] || ""}</td>
+              <td>${fila["Nombre"] || ""}</td>
+              <td>${fila["Puesto"] || ""}</td>
+              <td>${fila["Autoriza"] || ""}</td>
+              <td>${fila["Puesto Autoriza"] || ""}</td>
+              <td>${fila["Motivo"] || ""}</td>
+              <td>${fila["Marca de Tiempo"] || ""}</td>
+            `;
+            tabla.appendChild(tr);
+          });
         })
         .catch(err => console.error("Error al cargar historial:", err));
     }
-
-    // ⚡ Cargar historial al iniciar
-    cargarHistorial();
+  });
   </script>
+
 </body>
 </html>
-
-
-
 
 
 
