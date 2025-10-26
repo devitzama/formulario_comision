@@ -157,7 +157,7 @@
     document.getElementById("comisionForm").addEventListener("submit", function(e) {
       e.preventDefault();
       const formData = new FormData(this);
-      fetch(scriptURL, { method: "POST", body: formData })
+      fetch(scriptURL, { method: 'POST', body: formData })
         .then(() => {
           alert("✅ Datos guardados correctamente");
           this.reset();
@@ -203,6 +203,7 @@
 
 </body>
 </html>
+
 
 
 
