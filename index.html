@@ -126,8 +126,11 @@
     const scriptURL = "https://script.google.com/macros/s/AKfycbz8vfVN8XkO-Kil1OL8vQ-exayE7nImPaKa2aFJRQRrs4T_e2GeVO-sBGe_Vkw5j89Nsw/exec";
 
     // 📅 Fecha actual automática
-    const hoy = new Date().toISOString().split("T")[0];
-    document.getElementById("fechaActual").value = hoy;
+    const hoy = new Date();
+    const offsetMs = hoy.getTimezoneOffset() * 60000;
+    const fechaLocal = new Date(hoy.getTime() - offsetMs);
+    const fechaISO = fechaLocal.toISOString().split("T")[0];
+    document.getElementById("fechaActual").value = fechaISO;
     document.getElementById("fechaComision").value = hoy;
 
     // 🏙 Cargar municipios desde municipios.txt
@@ -203,6 +206,7 @@
 
 </body>
 </html>
+
 
 
 
