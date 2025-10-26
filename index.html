@@ -131,7 +131,7 @@
     const fechaLocal = new Date(hoy.getTime() - offsetMs);
     const fechaISO = fechaLocal.toISOString().split("T")[0];
     document.getElementById("fechaActual").value = fechaISO;
-    document.getElementById("fechaComision").value = fechaLocal;
+    document.getElementById("fechaComision").value = fechaISO;
 
     // 🏙 Cargar municipios desde municipios.txt
     fetch("municipios.txt")
@@ -206,6 +206,7 @@
 
 </body>
 </html>
+
 
 
 
