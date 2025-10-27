@@ -1,224 +1,290 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formulario de Comisión</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-      background: #f4f6f8;
-    }
-    h1, h2 {
-      text-align: center;
-      color: #333;
-    }
-    form {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 700px;
-      margin: auto;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-top: 5px;
-      box-sizing: border-box;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 15px;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 40px;
-      background: white;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #007bff;
-      color: white;
-    }
-  </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Registro de Comisión</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="container">
+    <h1>Registro de Comisión</h1>
+    <form id="formComision">
+      <!-- 1 Oficio -->
+      <label>Oficio</label>
+      <input type="number" id="oficio" name="oficio" required>
 
-  <h1>Formulario de Comisión</h1>
+      <!-- 2 Fecha -->
+      <label>Fecha</label>
+      <input type="date" id="fecha" name="fecha" required>
 
-  <form id="comisionForm">
-    <label>Número de Oficio:</label>
-    <input type="text" id="oficio" name="oficio" required>
+      <!-- 3 Nombre -->
+      <label>Nombre</label>
+      <input type="text" id="nombre" name="nombre" list="dlNombre">
+      <datalist id="dlNombre"></datalist>
 
-    <label>Fecha:</label>
-    <input type="date" id="fechaActual" name="fecha" required>
+      <!-- 4 Puesto -->
+      <label>Puesto</label>
+      <input type="text" id="puesto" name="puesto" list="dlPuesto">
+      <datalist id="dlPuesto"></datalist>
 
-    <label>Lugar de Comisión:</label>
-    <select id="lugarComision" name="lugarComision" required>
-      <option value="">Cargando municipios...</option>
-    </select>
+      <!-- 5 Tipo -->
+      <label>Tipo</label>
+      <select id="tipo" name="tipo" required>
+        <option value="">Selecciona</option>
+        <option value="Base">Base</option>
+        <option value="Contrato">Contrato</option>
+      </select>
 
-    <label>Fecha de Comisión:</label>
-    <input type="date" id="fechaComision" name="fechaComision" required>
+      <!-- 6 Fecha inicial -->
+      <label>Fecha inicial</label>
+      <input type="date" id="fechaInicial" name="fechaInicial" required>
 
-    <label>Nombre:</label>
-    <input type="text" id="nombre" name="nombre" required>
+      <!-- 7 Fecha final -->
+      <label>Fecha final</label>
+      <input type="date" id="fechaFinal" name="fechaFinal" required>
 
-    <label>Puesto:</label>
-    <input type="text" id="puesto" name="puesto" required>
+      <!-- 8 Fechas de comisión (readonly) -->
+      <label>Fechas de comisión</label>
+      <input type="text" id="fechasComision" name="fechasComision" readonly>
 
-    <label>Quién autoriza:</label>
-    <input type="text" id="autoriza" name="autoriza" required>
+      <!-- 9 Días de comisión (readonly) -->
+      <label>Días de comisión</label>
+      <input type="number" id="diasComision" name="diasComision" readonly>
 
-    <label>Puesto de quien autoriza:</label>
-    <input type="text" id="puestoAutoriza" name="puestoAutoriza" required>
+      <!-- 10 Lugar -->
+      <label>Lugar de comisión</label>
+      <input type="text" id="lugar" name="lugar" list="dlLugar">
+      <datalist id="dlLugar"></datalist>
 
-    <label>Motivo de la comisión:</label>
-    <textarea id="motivo" name="motivo" rows="3" required></textarea>
+      <!-- 11 Motivo -->
+      <label>Motivo de comisión</label>
+      <input type="text" id="motivo" name="motivo" list="dlMotivo">
+      <datalist id="dlMotivo"></datalist>
 
-    <button type="submit">Guardar</button>
-  </form>
+      <!-- 12 Región -->
+      <label>Región</label>
+      <input type="text" id="region" name="region" list="dlRegion">
+      <datalist id="dlRegion"></datalist>
 
-  <h2>Historial de Comisiones</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Número de Oficio</th>
-        <th>Fecha</th>
-        <th>Lugar de Comisión</th>
-        <th>Fecha de Comisión</th>
-        <th>Nombre</th>
-        <th>Puesto</th>
-        <th>Autoriza</th>
-        <th>Puesto Autoriza</th>
-        <th>Motivo</th>
-        <th>Marca de Tiempo</th>
-      </tr>
-    </thead>
-    <tbody id="tablaHistorial"></tbody>
-  </table>
+      <!-- 13 Medio transporte -->
+      <label>Medio de transporte</label>
+      <select id="medioTransporte" name="medioTransporte">
+        <option value="">Selecciona</option>
+        <option value="Vehículo Oficial">Vehículo Oficial</option>
+        <option value="Vehículo personal">Vehículo personal</option>
+        <option value="Autobús">Autobús</option>
+      </select>
 
-  <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    // ⚙️ Cambia esta URL por tu Apps Script publicado
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzQOYioAaanEqV1PeV4NoY_F6cRkFL1h0iPLIFXQEJ75Fvr8vpeNAJxTDL1vwgDzlBkuA/exec";
+      <div id="vehiculoWrap" style="display:none;">
+        <label>Marca</label>
+        <input type="text" id="marca" name="marca" list="dlMarca">
+        <datalist id="dlMarca"></datalist>
 
-    // 📅 Fecha actual automática
-    const hoy = new Date();
-    const offsetMs = hoy.getTimezoneOffset() * 60000;
-    const fechaLocal = new Date(hoy.getTime() - offsetMs);
-    const fechaISO = fechaLocal.toISOString().split("T")[0];
-    document.getElementById("fechaActual").value = fechaISO;
-    document.getElementById("fechaComision").value = fechaISO;
+        <label>Modelo</label>
+        <input type="text" id="modelo" name="modelo" list="dlModelo">
+        <datalist id="dlModelo"></datalist>
 
-    // 🏙 Cargar municipios desde municipios.txt
-    fetch("municipios.txt")
-      .then(response => response.text())
-      .then(text => {
-        const municipios = text.split("\n").map(m => m.trim()).filter(m => m);
-        const select = document.getElementById("lugarComision");
-        select.innerHTML = "<option value=''>Seleccione un municipio</option>";
-        municipios.forEach(nombre => {
-          const option = document.createElement("option");
-          option.textContent = nombre;
-          option.value = nombre;
-          select.appendChild(option);
-        });
-      })
-      .catch(err => {
-        console.error("Error cargando municipios:", err);
-        document.getElementById("lugarComision").innerHTML =
-          "<option>Error al cargar municipios</option>";
+        <label>Placa</label>
+        <input type="text" id="placa" name="placa" list="dlPlaca">
+        <datalist id="dlPlaca"></datalist>
+      </div>
+
+      <!-- Autoriza -->
+      <label>Autoriza</label>
+      <input type="text" id="autoriza" name="autoriza" list="dlAutoriza">
+      <datalist id="dlAutoriza"></datalist>
+
+      <label>Puesto de quien autoriza</label>
+      <input type="text" id="puestoAutoriza" name="puestoAutoriza" list="dlPuestoAutoriza">
+      <datalist id="dlPuestoAutoriza"></datalist>
+
+      <label>Vo.Bo.</label>
+      <input type="text" id="vobo" name="vobo" list="dlVoBo">
+      <datalist id="dlVoBo"></datalist>
+
+      <label>Puesto Vo.Bo.</label>
+      <input type="text" id="puestoVoBo" name="puestoVoBo" list="dlPuestoVoBo">
+      <datalist id="dlPuestoVoBo"></datalist>
+
+      <!-- Anticipado (compact) -->
+      <h2>Anticipado</h2>
+      <div class="compact-grid">
+        <div><label>Alim.</label><input type="number" id="alimentacionAnt" name="alimentacionAnt" min="0" step="0.01" value="0"></div>
+        <div><label>Hosp.</label><input type="number" id="hospedajeAnt" name="hospedajeAnt" min="0" step="0.01" value="0"></div>
+        <div><label>Comb.</label><input type="number" id="combustibleAnt" name="combustibleAnt" min="0" step="0.01" value="0"></div>
+        <div><label>Peaje</label><input type="number" id="peajeAnt" name="peajeAnt" min="0" step="0.01" value="0"></div>
+        <div><label>Pasaj.</label><input type="number" id="pasajesAnt" name="pasajesAnt" min="0" step="0.01" value="0"></div>
+        <div><label>Otros</label><input type="number" id="otrosAnt" name="otrosAnt" min="0" step="0.01" value="0"></div>
+      </div>
+      <label>Total anticipado</label>
+      <input type="number" id="totalAnt" name="totalAnt" readonly>
+
+      <!-- Devengado (compact) -->
+      <h2>Devengado</h2>
+      <div class="compact-grid">
+        <div><label>Alim.</label><input type="number" id="alimentacionDev" name="alimentacionDev" min="0" step="0.01" value="0"></div>
+        <div><label>Hosp.</label><input type="number" id="hospedajeDev" name="hospedajeDev" min="0" step="0.01" value="0"></div>
+        <div><label>Comb.</label><input type="number" id="combustibleDev" name="combustibleDev" min="0" step="0.01" value="0"></div>
+        <div><label>Peaje</label><input type="number" id="peajeDev" name="peajeDev" min="0" step="0.01" value="0"></div>
+        <div><label>Pasaj.</label><input type="number" id="pasajesDev" name="pasajesDev" min="0" step="0.01" value="0"></div>
+        <div><label>Otros</label><input type="number" id="otrosDev" name="otrosDev" min="0" step="0.01" value="0"></div>
+      </div>
+      <label>Total devengado</label>
+      <input type="number" id="totalDev" name="totalDev" readonly>
+
+      <!-- Fecha de anticipado -->
+      <label>Fecha de anticipado</label>
+      <input type="date" id="fechaAnticipado" name="fechaAnticipado">
+
+      <!-- Fecha de comprobación (por defecto hoy) -->
+      <label>Fecha de comprobación</label>
+      <input type="date" id="fechaComprobacion" name="fechaComprobacion">
+
+      <div class="buttons">
+        <button type="submit">Guardar</button>
+        <button type="button" id="btnHist">Ver Comisiones</button>
+      </div>
+    </form>
+  </div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwffxZ1nt5blIKChONoUHKU6xdnPVbqn_4AgPipQiyOoBmjrLNoX6RQwLfYuSmePkm0Zg/exec"; // <-- reemplaza
+
+const $ = id => document.getElementById(id);
+
+// Utils
+function isoToday() {
+  const d = new Date();
+  return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().split("T")[0];
+}
+
+// cargar sugerencias y next oficio
+async function cargarInicial() {
+  // cargar sugerencias y next
+  try {
+    // sugerencias
+    const s = await (await fetch(API_URL + "?action=sugerencias")).json();
+    if (s && s.success && s.data) {
+      const mapa = {
+        nombre: "dlNombre", puesto: "dlPuesto", lugar: "dlLugar", motivo: "dlMotivo",
+        region: "dlRegion", marca: "dlMarca", modelo: "dlModelo", placa: "dlPlaca",
+        autoriza: "dlAutoriza", puestoAutoriza: "dlPuestoAutoriza", vobo: "dlVoBo", puestoVoBo: "dlPuestoVoBo"
+      };
+      for (const k in mapa) {
+        const arr = s.data[k] || [];
+        const dl = document.getElementById(mapa[k]);
+        if (!dl) continue;
+        dl.innerHTML = "";
+        arr.forEach(v => { if (v) dl.appendChild(Object.assign(document.createElement("option"), { value: v })); });
+      }
+    }
+    // next
+    const nextR = await (await fetch(API_URL + "?action=next")).json();
+    if (nextR && nextR.success) $("oficio").value = nextR.next || 1;
+    else $("oficio").value = 1;
+  } catch (err){ console.warn("init error", err); $("oficio").value = 1; }
+  // fechas por defecto
+  $("fecha").value = isoToday();
+  $("fechaInicial").value = isoToday();
+  $("fechaFinal").value = isoToday();
+  $("fechaComprobacion").value = isoToday();
+  $("fechaAnticipado").value = "";
+  actualizarFechas(); calcTotalAnt(); calcTotalDev();
+}
+
+// eventos
+function actualizarFechas(){
+  const fi = new Date($("fechaInicial").value);
+  const ff = new Date($("fechaFinal").value);
+  if (isNaN(fi.getTime()) || isNaN(ff.getTime())) { $("fechasComision").value=""; $("diasComision").value=""; return; }
+  $("fechasComision").value = $("fechaInicial").value + " a " + $("fechaFinal").value;
+  const diff = Math.floor((ff - fi)/(1000*60*60*24));
+  $("diasComision").value = diff >= 0 ? diff + 1 : 0;
+}
+
+function calcTotalAnt(){
+  const ids = ["alimentacionAnt","hospedajeAnt","combustibleAnt","peajeAnt","pasajesAnt","otrosAnt"];
+  let t=0; ids.forEach(id=> t += parseFloat($(id).value || 0));
+  $("totalAnt").value = t.toFixed(2);
+  if (t>0) $("fechaAnticipado").value = $("fecha").value;
+}
+
+function calcTotalDev(){
+  const ids = ["alimentacionDev","hospedajeDev","combustibleDev","peajeDev","pasajesDev","otrosDev"];
+  let t=0; ids.forEach(id=> t += parseFloat($(id).value || 0));
+  $("totalDev").value = t.toFixed(2);
+}
+
+// listeners
+document.addEventListener("DOMContentLoaded", ()=>{
+  cargarInicial();
+  $("fechaInicial").addEventListener("change", actualizarFechas);
+  $("fechaFinal").addEventListener("change", actualizarFechas);
+  ["alimentacionAnt","hospedajeAnt","combustibleAnt","peajeAnt","pasajesAnt","otrosAnt"].forEach(id=>$(id).addEventListener("input", calcTotalAnt));
+  ["alimentacionDev","hospedajeDev","combustibleDev","peajeDev","pasajesDev","otrosDev"].forEach(id=>$(id).addEventListener("input", calcTotalDev));
+  $("medioTransporte").addEventListener("change", ()=> { $("vehiculoWrap").style.display = ($("medioTransporte").value==="Vehículo Oficial") ? "block" : "none"; });
+  $("btnHist").addEventListener("click", ()=> location.href = "historial.html");
+
+  $("formComision").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    // build payload matching Code.gs fields
+    const payload = {
+      mode: "create",
+      oficio: $("oficio").value,
+      fecha: $("fecha").value,
+      nombre: $("nombre").value,
+      puesto: $("puesto").value,
+      tipo: $("tipo").value,
+      fechaInicial: $("fechaInicial").value,
+      fechaFinal: $("fechaFinal").value,
+      lugar: $("lugar").value,
+      motivo: $("motivo").value,
+      region: $("region").value,
+      mediotransporte: $("medioTransporte").value,
+      marca: $("marca").value,
+      modelo: $("modelo").value,
+      placa: $("placa").value,
+      autoriza: $("autoriza").value,
+      puestoAutoriza: $("puestoAutoriza").value,
+      vobo: $("vobo").value,
+      puestoVoBo: $("puestoVoBo").value,
+      alimentacionAnt: $("alimentacionAnt").value || 0,
+      hospedajeAnt: $("hospedajeAnt").value || 0,
+      combustibleAnt: $("combustibleAnt").value || 0,
+      peajeAnt: $("peajeAnt").value || 0,
+      pasajesAnt: $("pasajesAnt").value || 0,
+      otrosAnt: $("otrosAnt").value || 0,
+      alimentacionDev: $("alimentacionDev").value || 0,
+      hospedajeDev: $("hospedajeDev").value || 0,
+      combustibleDev: $("combustibleDev").value || 0,
+      peajeDev: $("peajeDev").value || 0,
+      pasajesDev: $("pasajesDev").value || 0,
+      otrosDev: $("otrosDev").value || 0,
+      fechaAnticipado: $("fechaAnticipado").value || "",
+      fechaComprobacion: $("fechaComprobacion").value || ""
+    };
+    // compute totals clientside (server also computes)
+    payload.totalAnt = $("totalAnt").value || 0;
+    payload.totalDev = $("totalDev").value || 0;
+
+    try {
+      const res = await fetch(API_URL, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
       });
-
-    // 📥 Cargar historial al inicio
-    cargarHistorial();
-
-    // 📨 Envío del formulario a Google Sheets
-    document.getElementById("comisionForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      fetch(scriptURL, { method: 'POST', body: formData })
-        .then(() => {
-          alert("✅ Datos guardados correctamente");
-          this.reset();
-          document.getElementById("fechaActual").value = fechaISO;
-          document.getElementById("fechaComision").value = fechaISO;
-          cargarHistorial();
-        })
-        .catch(err => alert("❌ Error al guardar: " + err.message));
-    });
-
-    // 📄 Función para mostrar historial desde Google Sheets
-    function cargarHistorial() {
-      fetch(scriptURL)
-        .then(response => response.json())
-        .then(data => {
-          const tabla = document.getElementById("tablaHistorial");
-          const nombreSug = document.getElementById("nombre");
-          tabla.innerHTML = "";
-          if (data.length === 0) {
-            tabla.innerHTML = "<tr><td colspan='10'>No hay registros</td></tr>";
-            return;
-          }
-          data.forEach(fila => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${fila["Número de Oficio"] || ""}</td>
-              <td>${fila["Fecha"] || ""}</td>
-              <td>${fila["Lugar de Comisión"] || ""}</td>
-              <td>${fila["Fecha de Comisión"] || ""}</td>
-              <td>${fila["Nombre"] || ""}</td>
-              <td>${fila["Puesto"] || ""}</td>
-              <td>${fila["Autoriza"] || ""}</td>
-              <td>${fila["Puesto Autoriza"] || ""}</td>
-              <td>${fila["Motivo"] || ""}</td>
-              <td>${fila["Marca de Tiempo"] || ""}</td>
-            `;
-            tabla.appendChild(tr);
-          });
-          data.forEach(fila =>{
-              const option = document.crateElement('option');
-              option.value = fila.nombre;
-              nombreSug.appendChild(option);
-          });
-        })
-        .catch(err => console.error("Error al cargar historial:", err));
+      const j = await res.json();
+      if (j && j.success) { alert("Guardado ✅"); location.href = "historial.html"; }
+      else { alert("Error: " + (j.error || j.message || "desconocido")); }
+    } catch(err){
+      console.error(err); alert("Error de conexión al guardar");
     }
   });
-  </script>
-
+});
+</script>
 </body>
 </html>
-
-
-
-
-
-
-
 
 
 
