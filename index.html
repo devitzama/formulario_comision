@@ -1,292 +1,375 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Registro de Comisión</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Registro de Comisión</title>
+<style>
+  :root{--accent:#0b63a7;--muted:#6b7280;--bg:#f3f6f8}
+  body{font-family:Inter,system-ui,Arial;background:var(--bg);margin:0;padding:20px;color:#0b1823}
+  .card{max-width:980px;margin:12px auto;background:#fff;padding:18px;border-radius:10px;box-shadow:0 6px 20px rgba(10,10,10,0.06)}
+  h1{color:var(--accent);margin:0 0 10px}
+  label{display:block;font-weight:600;margin-top:10px;font-size:0.95rem}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .col{flex:1;min-width:180px}
+  input,select,textarea{width:100%;padding:9px;border-radius:8px;border:1px solid #e6eef6;font-size:14px}
+  textarea{min-height:64px}
+  .section{margin-top:14px;padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef5fb}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+  .totals{display:flex;gap:10px;align-items:center;margin-top:10px}
+  .totals .box{flex:1;padding:10px;border-radius:8px;background:#fff;border:1px solid #e9f2fb;text-align:center}
+  .actions{display:flex;gap:10px;margin-top:14px}
+  button{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:0;cursor:pointer}
+  button.ghost{background:#6b7280}
+  .hint{font-size:12px;color:var(--muted);margin-top:4px}
+  .readonly{background:#f6f8fa}
+  .small{font-size:13px;color:var(--muted)}
+</style>
 </head>
 <body>
-  <div class="container">
+  <div class="card">
     <h1>Registro de Comisión</h1>
-    <form id="formComision">
-      <!-- 1 Oficio -->
-      <label>Oficio</label>
-      <input type="number" id="oficio" name="oficio" required>
 
-      <!-- 2 Fecha -->
-      <label>Fecha</label>
-      <input type="date" id="fecha" name="fecha" required>
-
-      <!-- 3 Nombre -->
-      <label>Nombre</label>
-      <input type="text" id="nombre" name="nombre" list="dlNombre">
-      <datalist id="dlNombre"></datalist>
-
-      <!-- 4 Puesto -->
-      <label>Puesto</label>
-      <input type="text" id="puesto" name="puesto" list="dlPuesto">
-      <datalist id="dlPuesto"></datalist>
-
-      <!-- 5 Tipo -->
-      <label>Tipo</label>
-      <select id="tipo" name="tipo" required>
-        <option value="">Selecciona</option>
-        <option value="Base">Base</option>
-        <option value="Contrato">Contrato</option>
-      </select>
-
-      <!-- 6 Fecha inicial -->
-      <label>Fecha inicial</label>
-      <input type="date" id="fechaInicial" name="fechaInicial" required>
-
-      <!-- 7 Fecha final -->
-      <label>Fecha final</label>
-      <input type="date" id="fechaFinal" name="fechaFinal" required>
-
-      <!-- 8 Fechas de comisión (readonly) -->
-      <label>Fechas de comisión</label>
-      <input type="text" id="fechasComision" name="fechasComision" readonly>
-
-      <!-- 9 Días de comisión (readonly) -->
-      <label>Días de comisión</label>
-      <input type="number" id="diasComision" name="diasComision" readonly>
-
-      <!-- 10 Lugar -->
-      <label>Lugar de comisión</label>
-      <input type="text" id="lugar" name="lugar" list="dlLugar">
-      <datalist id="dlLugar"></datalist>
-
-      <!-- 11 Motivo -->
-      <label>Motivo de comisión</label>
-      <input type="text" id="motivo" name="motivo" list="dlMotivo">
-      <datalist id="dlMotivo"></datalist>
-
-      <!-- 12 Región -->
-      <label>Región</label>
-      <input type="text" id="region" name="region" list="dlRegion">
-      <datalist id="dlRegion"></datalist>
-
-      <!-- 13 Medio transporte -->
-      <label>Medio de transporte</label>
-      <select id="medioTransporte" name="medioTransporte">
-        <option value="">Selecciona</option>
-        <option value="Vehículo Oficial">Vehículo Oficial</option>
-        <option value="Vehículo personal">Vehículo personal</option>
-        <option value="Autobús">Autobús</option>
-      </select>
-
-      <div id="vehiculoWrap" style="display:none;">
-        <label>Marca</label>
-        <input type="text" id="marca" name="marca" list="dlMarca">
-        <datalist id="dlMarca"></datalist>
-
-        <label>Modelo</label>
-        <input type="text" id="modelo" name="modelo" list="dlModelo">
-        <datalist id="dlModelo"></datalist>
-
-        <label>Placa</label>
-        <input type="text" id="placa" name="placa" list="dlPlaca">
-        <datalist id="dlPlaca"></datalist>
+    <form id="form">
+      <div class="row">
+        <div class="col">
+          <label>Número de Oficio</label>
+          <input id="oficio" name="oficio" type="text" required>
+          <div class="hint">Se propone un número automático; puedes editarlo. Si ya existe al guardar, se rechazará.</div>
+        </div>
+        <div class="col">
+          <label>Fecha</label>
+          <input id="fecha" name="fecha" type="date" required>
+        </div>
+        <div class="col">
+          <label>Tipo</label>
+          <select id="tipo" name="tipo" required>
+            <option value="base">Base</option>
+            <option value="contrato">Contrato</option>
+          </select>
+        </div>
       </div>
 
-      <!-- Autoriza -->
-      <label>Autoriza</label>
-      <input type="text" id="autoriza" name="autoriza" list="dlAutoriza">
-      <datalist id="dlAutoriza"></datalist>
-
-      <label>Puesto de quien autoriza</label>
-      <input type="text" id="puestoAutoriza" name="puestoAutoriza" list="dlPuestoAutoriza">
-      <datalist id="dlPuestoAutoriza"></datalist>
-
-      <label>Vo.Bo.</label>
-      <input type="text" id="vobo" name="vobo" list="dlVoBo">
-      <datalist id="dlVoBo"></datalist>
-
-      <label>Puesto Vo.Bo.</label>
-      <input type="text" id="puestoVoBo" name="puestoVoBo" list="dlPuestoVoBo">
-      <datalist id="dlPuestoVoBo"></datalist>
-
-      <!-- Anticipado (compact) -->
-      <h2>Anticipado</h2>
-      <div class="compact-grid">
-        <div><label>Alim.</label><input type="number" id="alimentacionAnt" name="alimentacionAnt" min="0" step="0.01" value="0"></div>
-        <div><label>Hosp.</label><input type="number" id="hospedajeAnt" name="hospedajeAnt" min="0" step="0.01" value="0"></div>
-        <div><label>Comb.</label><input type="number" id="combustibleAnt" name="combustibleAnt" min="0" step="0.01" value="0"></div>
-        <div><label>Peaje</label><input type="number" id="peajeAnt" name="peajeAnt" min="0" step="0.01" value="0"></div>
-        <div><label>Pasaj.</label><input type="number" id="pasajesAnt" name="pasajesAnt" min="0" step="0.01" value="0"></div>
-        <div><label>Otros</label><input type="number" id="otrosAnt" name="otrosAnt" min="0" step="0.01" value="0"></div>
+      <div class="row">
+        <div class="col">
+          <label>Nombre</label>
+          <input id="nombre" name="nombre" list="dlNombre" required>
+          <datalist id="dlNombre"></datalist>
+        </div>
+        <div class="col">
+          <label>Puesto</label>
+          <input id="puesto" name="puesto" list="dlPuesto" required>
+          <datalist id="dlPuesto"></datalist>
+        </div>
+        <div class="col">
+          <label>Región</label>
+          <input id="region" name="region" list="dlRegion">
+          <datalist id="dlRegion"></datalist>
+        </div>
       </div>
-      <label>Total anticipado</label>
-      <input type="number" id="totalAnt" name="totalAnt" readonly>
 
-      <!-- Devengado (compact) -->
-      <h2>Devengado</h2>
-      <div class="compact-grid">
-        <div><label>Alim.</label><input type="number" id="alimentacionDev" name="alimentacionDev" min="0" step="0.01" value="0"></div>
-        <div><label>Hosp.</label><input type="number" id="hospedajeDev" name="hospedajeDev" min="0" step="0.01" value="0"></div>
-        <div><label>Comb.</label><input type="number" id="combustibleDev" name="combustibleDev" min="0" step="0.01" value="0"></div>
-        <div><label>Peaje</label><input type="number" id="peajeDev" name="peajeDev" min="0" step="0.01" value="0"></div>
-        <div><label>Pasaj.</label><input type="number" id="pasajesDev" name="pasajesDev" min="0" step="0.01" value="0"></div>
-        <div><label>Otros</label><input type="number" id="otrosDev" name="otrosDev" min="0" step="0.01" value="0"></div>
+      <div class="row">
+        <div class="col">
+          <label>Fecha inicio de comisión</label>
+          <input id="fechaInicio" name="fechaInicio" type="date" required>
+        </div>
+        <div class="col">
+          <label>Fecha fin de comisión</label>
+          <input id="fechaFin" name="fechaFin" type="date" required>
+        </div>
+        <div class="col">
+          <label>Fechas de comisión</label>
+          <input id="fechasComision" name="fechas_comision" type="text" readonly class="readonly">
+        </div>
       </div>
-      <label>Total devengado</label>
-      <input type="number" id="totalDev" name="totalDev" readonly>
 
-      <!-- Fecha de anticipado -->
-      <label>Fecha de anticipado</label>
-      <input type="date" id="fechaAnticipado" name="fechaAnticipado">
+      <div class="row">
+        <div class="col">
+          <label>Días de comisión</label>
+          <input id="diasComision" name="dias_comision" type="number" readonly class="readonly">
+        </div>
+        <div class="col">
+          <label>Lugar de comisión</label>
+          <input id="lugar" name="lugar" list="dlLugar" required>
+          <datalist id="dlLugar"></datalist>
+        </div>
+        <div class="col">
+          <label>Motivo de comisión</label>
+          <input id="motivo" name="motivo" list="dlMotivo">
+          <datalist id="dlMotivo"></datalist>
+        </div>
+      </div>
 
-      <!-- Fecha de comprobación (por defecto hoy) -->
-      <label>Fecha de comprobación</label>
-      <input type="date" id="fechaComprobacion" name="fechaComprobacion">
+      <div class="row">
+        <div class="col">
+          <label>Medio de transporte</label>
+          <select id="medio" name="medio_transporte">
+            <option value="Vehículo Oficial">Vehículo Oficial</option>
+            <option value="Vehículo personal">Vehículo personal</option>
+            <option value="Autobús">Autobús</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>Marca</label>
+          <input id="marca" name="marca" list="dlMarca">
+          <datalist id="dlMarca"></datalist>
+        </div>
+        <div class="col">
+          <label>Modelo</label>
+          <input id="modelo" name="modelo" list="dlModelo">
+          <datalist id="dlModelo"></datalist>
+        </div>
+      </div>
 
-      <div class="buttons">
+      <div class="row">
+        <div class="col">
+          <label>Placa</label>
+          <input id="placa" name="placa" list="dlPlaca">
+          <datalist id="dlPlaca"></datalist>
+        </div>
+        <div class="col">
+          <label>Autoriza</label>
+          <input id="autoriza" name="autoriza" list="dlAutoriza">
+          <datalist id="dlAutoriza"></datalist>
+        </div>
+        <div class="col">
+          <label>Puesto de quien autoriza</label>
+          <input id="puestoAutoriza" name="puesto_autoriza" list="dlPuestoAutoriza">
+          <datalist id="dlPuestoAutoriza"></datalist>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>Vo.Bo.</label>
+          <input id="vobo" name="vobo" list="dlVoBo">
+          <datalist id="dlVoBo"></datalist>
+        </div>
+        <div class="col">
+          <label>Puesto Vo.Bo.</label>
+          <input id="puestoVoBo" name="puesto_vobo" list="dlPuestoVoBo">
+          <datalist id="dlPuestoVoBo"></datalist>
+        </div>
+      </div>
+
+      <!-- Anticipado -->
+      <div class="section">
+        <strong>Anticipado</strong>
+        <div class="grid" style="margin-top:8px">
+          <div><label>Alimentación (MXN)</label><input id="antAlim" name="alim_antic" type="number" min="0" step="0.01"></div>
+          <div><label>Hospedaje (MXN)</label><input id="antHosp" name="hosp_antic" type="number" min="0" step="0.01"></div>
+          <div><label>Combustible (MXN)</label><input id="antComb" name="comb_antic" type="number" min="0" step="0.01"></div>
+          <div><label>Peaje (MXN)</label><input id="antPeaje" name="peaje_antic" type="number" min="0" step="0.01"></div>
+          <div><label>Pasajes (MXN)</label><input id="antPas" name="pasajes_antic" type="number" min="0" step="0.01"></div>
+          <div><label>Otros (MXN)</label><input id="antOtros" name="otros_antic" type="number" min="0" step="0.01"></div>
+        </div>
+
+        <div class="totals">
+          <div class="box">
+            <div class="small">Total anticipado</div>
+            <div id="totalAntDisplay">$0.00</div>
+          </div>
+          <div class="box">
+            <div class="small">Fecha de anticipado</div>
+            <input id="fechaAnt" name="fecha_antic" type="date">
+          </div>
+        </div>
+      </div>
+
+      <!-- Devengado -->
+      <div class="section">
+        <strong>Devengado</strong>
+        <div class="grid" style="margin-top:8px">
+          <div><label>Alimentación (MXN)</label><input id="devAlim" name="alim_dev" type="number" min="0" step="0.01"></div>
+          <div><label>Hospedaje (MXN)</label><input id="devHosp" name="hosp_dev" type="number" min="0" step="0.01"></div>
+          <div><label>Combustible (MXN)</label><input id="devComb" name="comb_dev" type="number" min="0" step="0.01"></div>
+          <div><label>Peaje (MXN)</label><input id="devPeaje" name="peaje_dev" type="number" min="0" step="0.01"></div>
+          <div><label>Pasajes (MXN)</label><input id="devPas" name="pasajes_dev" type="number" min="0" step="0.01"></div>
+          <div><label>Otros (MXN)</label><input id="devOtros" name="otros_dev" type="number" min="0" step="0.01"></div>
+        </div>
+
+        <div class="totals">
+          <div class="box">
+            <div class="small">Total devengado</div>
+            <div id="totalDevDisplay">$0.00</div>
+          </div>
+          <div class="box">
+            <div class="small">Fecha de comprobación</div>
+            <input id="fechaComp" name="fecha_comprobacion" type="date">
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
         <button type="submit">Guardar</button>
-        <button type="button" id="btnHist">Ver Comisiones</button>
+        <button type="button" class="ghost" onclick="location.href='historial.html'">Ver comisiones</button>
       </div>
     </form>
   </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwffxZ1nt5blIKChONoUHKU6xdnPVbqn_4AgPipQiyOoBmjrLNoX6RQwLfYuSmePkm0Zg/exec"; // <-- reemplaza
+/* CONFIG: pega tu URL /exec aquí (ya la puse por ti) */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyuqDDM8HOMS3penfSF-zpo--UlGmvX2tiXZIUp73O_8hJvxRKqvQniiyDZmPo91w7JHg/exec";
 
+/* Helpers */
 const $ = id => document.getElementById(id);
+const toMoneyStr = n => Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
+const capitalize = s => (s||"").toString().trim().toLowerCase().split(/\s+/).map(w => w[0]? w[0].toUpperCase()+w.slice(1):"").join(" ");
 
-// Utils
-function isoToday() {
-  const d = new Date();
-  return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().split("T")[0];
-}
+/* Inicializa fechas locales */
+(function initDates() {
+  const now = new Date();
+  const offset = now.getTimezoneOffset()*60000;
+  const local = new Date(now.getTime()-offset);
+  $('fecha').value = local.toISOString().slice(0,10);
+  $('fechaInicio').value = local.toISOString().slice(0,10);
+  $('fechaFin').value = local.toISOString().slice(0,10);
+  $('fechaComp').value = local.toISOString().slice(0,10);
+  $('fechaAnt').value = local.toISOString().slice(0,10);
+})();
 
-// cargar sugerencias y next oficio
-async function cargarInicial() {
-  // cargar sugerencias y next
+/* Cargar sugerencias y siguiente oficio */
+async function loadSuggestionsAndNext() {
   try {
-    // sugerencias
-    const s = await (await fetch(API_URL + "?action=sugerencias")).json();
-    if (s && s.success && s.data) {
-      const mapa = {
-        nombre: "dlNombre", puesto: "dlPuesto", lugar: "dlLugar", motivo: "dlMotivo",
-        region: "dlRegion", marca: "dlMarca", modelo: "dlModelo", placa: "dlPlaca",
-        autoriza: "dlAutoriza", puestoAutoriza: "dlPuestoAutoriza", vobo: "dlVoBo", puestoVoBo: "dlPuestoVoBo"
-      };
-      for (const k in mapa) {
-        const arr = s.data[k] || [];
-        const dl = document.getElementById(mapa[k]);
-        if (!dl) continue;
-        dl.innerHTML = "";
-        arr.forEach(v => { if (v) dl.appendChild(Object.assign(document.createElement("option"), { value: v })); });
-      }
-    }
-    // next
-    const nextR = await (await fetch(API_URL + "?action=next")).json();
-    if (nextR && nextR.success) $("oficio").value = nextR.next || 1;
-    else $("oficio").value = 1;
-  } catch (err){ console.warn("init error", err); $("oficio").value = 1; }
-  // fechas por defecto
-  $("fecha").value = isoToday();
-  $("fechaInicial").value = isoToday();
-  $("fechaFinal").value = isoToday();
-  $("fechaComprobacion").value = isoToday();
-  $("fechaAnticipado").value = "";
-  actualizarFechas(); calcTotalAnt(); calcTotalDev();
-}
-
-// eventos
-function actualizarFechas(){
-  const fi = new Date($("fechaInicial").value);
-  const ff = new Date($("fechaFinal").value);
-  if (isNaN(fi.getTime()) || isNaN(ff.getTime())) { $("fechasComision").value=""; $("diasComision").value=""; return; }
-  $("fechasComision").value = $("fechaInicial").value + " a " + $("fechaFinal").value;
-  const diff = Math.floor((ff - fi)/(1000*60*60*24));
-  $("diasComision").value = diff >= 0 ? diff + 1 : 0;
-}
-
-function calcTotalAnt(){
-  const ids = ["alimentacionAnt","hospedajeAnt","combustibleAnt","peajeAnt","pasajesAnt","otrosAnt"];
-  let t=0; ids.forEach(id=> t += parseFloat($(id).value || 0));
-  $("totalAnt").value = t.toFixed(2);
-  if (t>0) $("fechaAnticipado").value = $("fecha").value;
-}
-
-function calcTotalDev(){
-  const ids = ["alimentacionDev","hospedajeDev","combustibleDev","peajeDev","pasajesDev","otrosDev"];
-  let t=0; ids.forEach(id=> t += parseFloat($(id).value || 0));
-  $("totalDev").value = t.toFixed(2);
-}
-
-// listeners
-document.addEventListener("DOMContentLoaded", ()=>{
-  cargarInicial();
-  $("fechaInicial").addEventListener("change", actualizarFechas);
-  $("fechaFinal").addEventListener("change", actualizarFechas);
-  ["alimentacionAnt","hospedajeAnt","combustibleAnt","peajeAnt","pasajesAnt","otrosAnt"].forEach(id=>$(id).addEventListener("input", calcTotalAnt));
-  ["alimentacionDev","hospedajeDev","combustibleDev","peajeDev","pasajesDev","otrosDev"].forEach(id=>$(id).addEventListener("input", calcTotalDev));
-  $("medioTransporte").addEventListener("change", ()=> { $("vehiculoWrap").style.display = ($("medioTransporte").value==="Vehículo Oficial") ? "block" : "none"; });
-  $("btnHist").addEventListener("click", ()=> location.href = "historial.html");
-
-  $("formComision").addEventListener("submit", async (e)=>{
-    e.preventDefault();
-    // build payload matching Code.gs fields
-    const payload = {
-      mode: "create",
-      oficio: $("oficio").value,
-      fecha: $("fecha").value,
-      nombre: $("nombre").value,
-      puesto: $("puesto").value,
-      tipo: $("tipo").value,
-      fechaInicial: $("fechaInicial").value,
-      fechaFinal: $("fechaFinal").value,
-      lugar: $("lugar").value,
-      motivo: $("motivo").value,
-      region: $("region").value,
-      mediotransporte: $("medioTransporte").value,
-      marca: $("marca").value,
-      modelo: $("modelo").value,
-      placa: $("placa").value,
-      autoriza: $("autoriza").value,
-      puestoAutoriza: $("puestoAutoriza").value,
-      vobo: $("vobo").value,
-      puestoVoBo: $("puestoVoBo").value,
-      alimentacionAnt: $("alimentacionAnt").value || 0,
-      hospedajeAnt: $("hospedajeAnt").value || 0,
-      combustibleAnt: $("combustibleAnt").value || 0,
-      peajeAnt: $("peajeAnt").value || 0,
-      pasajesAnt: $("pasajesAnt").value || 0,
-      otrosAnt: $("otrosAnt").value || 0,
-      alimentacionDev: $("alimentacionDev").value || 0,
-      hospedajeDev: $("hospedajeDev").value || 0,
-      combustibleDev: $("combustibleDev").value || 0,
-      peajeDev: $("peajeDev").value || 0,
-      pasajesDev: $("pasajesDev").value || 0,
-      otrosDev: $("otrosDev").value || 0,
-      fechaAnticipado: $("fechaAnticipado").value || "",
-      fechaComprobacion: $("fechaComprobacion").value || ""
-    };
-    // compute totals clientside (server also computes)
-    payload.totalAnt = $("totalAnt").value || 0;
-    payload.totalDev = $("totalDev").value || 0;
-
-    try {
-      const res = await fetch(API_URL, {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify(payload)
+    const s = await fetch(SCRIPT_URL + '?suggestions=1');
+    const suggestions = await s.json();
+    // fill datalists with capitalized unique values
+    function fillDL(id, arr) {
+      const dl = $(id);
+      dl.innerHTML = "";
+      (arr||[]).forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        dl.appendChild(opt);
       });
-      const j = await res.json();
-      if (j && j.success) { alert("Guardado ✅"); location.href = "historial.html"; }
-      else { alert("Error: " + (j.error || j.message || "desconocido")); }
-    } catch(err){
-      console.error(err); alert("Error de conexión al guardar");
     }
+    fillDL('dlNombre', suggestions.nombre);
+    fillDL('dlPuesto', suggestions.puesto);
+    fillDL('dlLugar', suggestions.lugar);
+    fillDL('dlMotivo', suggestions.motivo);
+    fillDL('dlRegion', suggestions.region);
+    fillDL('dlMarca', suggestions.marca);
+    fillDL('dlModelo', suggestions.modelo);
+    fillDL('dlPlaca', suggestions.placa);
+    fillDL('dlAutoriza', suggestions.autoriza);
+    fillDL('dlPuestoAutoriza', suggestions.puesto_autoriza);
+    fillDL('dlVoBo', suggestions.vobo);
+    fillDL('dlPuestoVoBo', suggestions.puesto_vobo);
+
+    // obtener siguiente oficio
+    const m = await fetch(SCRIPT_URL + '?maxoficio=1');
+    const mj = await m.json();
+    $('oficio').value = mj.next || "1";
+  } catch (err) {
+    console.warn('No se pudieron cargar sugerencias/next:', err);
+    $('oficio').value = "1";
+  }
+}
+
+/* fechas de comisión + dias (auto) */
+function updateFechasYDias(){
+  const f1 = $('fechaInicio').value;
+  const f2 = $('fechaFin').value;
+  if (f1 && f2) {
+    const d1 = new Date(f1), d2 = new Date(f2);
+    if (!isNaN(d1.getTime()) && !isNaN(d2.getTime())) {
+      const months = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+      const f1L = d1.getDate() + " de " + months[d1.getMonth()] + " de " + d1.getFullYear();
+      const f2L = d2.getDate() + " de " + months[d2.getMonth()] + " de " + d2.getFullYear();
+      $('fechasComision').value = f1L + " al " + f2L;
+      const diff = Math.round((d2 - d1)/(1000*60*60*24)) + 1;
+      $('diasComision').value = diff >= 0 ? diff : 0;
+      return;
+    }
+  }
+  $('fechasComision').value = "";
+  $('diasComision').value = "";
+}
+
+/* totales */
+function updateTotales() {
+  const antIds = ['antAlim','antHosp','antComb','antPeaje','antPas','antOtros'];
+  const devIds = ['devAlim','devHosp','devComb','devPeaje','devPas','devOtros'];
+  let totalA = 0, totalD = 0;
+  antIds.forEach(id => totalA += Number($(id).value || 0));
+  devIds.forEach(id => totalD += Number($(id).value || 0));
+  $('totalAntDisplay').textContent = '$' + toMoneyStr(totalA);
+  $('totalDevDisplay').textContent = '$' + toMoneyStr(totalD);
+  // fechaAnt behavior
+  if (totalA > 0) {
+    $('fechaAnt').value = $('fecha').value;
+    $('fechaAnt').readOnly = true;
+  } else {
+    $('fechaAnt').readOnly = false;
+  }
+}
+
+/* vehiculo official toggle */
+function toggleVehiculo() {
+  const disable = $('medio').value !== "Vehículo Oficial";
+  ['marca','modelo','placa'].forEach(id => {
+    $(id).disabled = disable;
+    if (disable) { $(id).value = ""; }
   });
+}
+
+/* submit - use URLSearchParams to avoid preflight */
+document.getElementById('form').addEventListener('submit', async function(e){
+  e.preventDefault();
+  // collect form data
+  const fm = new FormData(this);
+  // include totals
+  const totalAntNum = ['antAlim','antHosp','antComb','antPeaje','antPas','antOtros'].reduce((s,id)=>s+Number($(id).value||0),0);
+  const totalDevNum = ['devAlim','devHosp','devComb','devPeaje','devPas','devOtros'].reduce((s,id)=>s+Number($(id).value||0),0);
+  fm.set('total_antic', totalAntNum);
+  fm.set('total_dev', totalDevNum);
+
+  // ensure ISO dates are sent (yyyy-mm-dd) for server detection
+  // the date inputs already provide ISO; for readonly fields server will compute long versions
+  const params = new URLSearchParams();
+  for (const [k,v] of fm.entries()) params.append(k, v);
+
+  try {
+    const resp = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      // headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params
+    });
+    if (!resp.ok) throw new Error("HTTP status "+ resp.status);
+    const json = await resp.json();
+    if (json.success) {
+      alert('✅ Guardado correctamente');
+      this.reset();
+      // reset dates and reload suggestions/next
+      (function resetDates(){ const now=new Date(); const off=now.getTimezoneOffset()*60000; const local=new Date(now.getTime()-off); $('fecha').value=local.toISOString().slice(0,10); $('fechaInicio').value=local.toISOString().slice(0,10); $('fechaFin').value=local.toISOString().slice(0,10); $('fechaComp').value=local.toISOString().slice(0,10); $('fechaAnt').value=local.toISOString().slice(0,10);} )();
+      updateTotales(); updateFechasYDias(); toggleVehiculo();
+      loadSuggestionsAndNext();
+    } else {
+      if (json.error === 'oficio_duplicado') alert('❌ El número de oficio ya existe. Cambia el número o edita ese oficio.');
+      else alert('❌ Error: ' + (json.error || 'desconocido'));
+    }
+  } catch (err) {
+    console.error('Error guardando:', err);
+    alert('Error al guardar (ver consola).');
+  }
 });
+
+/* events */
+['fechaInicio','fechaFin'].forEach(id => $(id).addEventListener('change', updateFechasYDias));
+['antAlim','antHosp','antComb','antPeaje','antPas','antOtros','devAlim','devHosp','devComb','devPeaje','devPas','devOtros','fecha'].forEach(id=>{
+  const el = $(id);
+  if (el) el.addEventListener('input', updateTotales);
+});
+$('medio').addEventListener('change', toggleVehiculo);
+
+/* inicial */
+loadSuggestionsAndNext();
+toggleVehiculo();
+updateFechasYDias();
+updateTotales();
 </script>
 </body>
 </html>
-
-
 
 
 
