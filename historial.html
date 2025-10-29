@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Comisiones - Lista</title>
+<style>
+  :root{--accent:#0b63a7;--muted:#6b7280;--bg:#f3f6f8}
+  body{font-family:Inter,system-ui,Arial;background:var(--bg);margin:0;padding:20px;color:#0b1823}
+  .wrap{max-width:1100px;margin:auto;background:#fff;padding:18px;border-radius:10px;box-shadow:0 6px 20px rgba(10,10,10,0.06)}
+  h1{color:var(--accent);margin:0}
+  .toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:12px}
+  input{padding:8px;border-radius:8px;border:1px solid #e6eef6}
+  table{width:100%;border-collapse:collapse;margin-top:12px}
+  th,td{padding:8px;border:1px solid #eef5fb;text-align:center;font-size:14px}
+  th{background:var(--accent);color:#fff}
+  tr:nth-child(even){background:#fbfdff}
+  .pager{display:flex;gap:8px;align-items:center}
+  button{padding:8px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+  .btn-edit{background:#0b63a7;color:#fff;padding:6px 8px;border-radius:6px;border:0;cursor:pointer}
+  .diff-positive{color:#0b8936;font-weight:700} /* verde */
+  .diff-negative{color:#c53030;font-weight:700} /* rojo */
+  .diff-zero{color:#0b63a7;font-weight:700} /* azul */
+  @media (max-width:800px){
+    .toolbar{flex-direction:column;align-items:stretch}
+    table,thead,tbody,th,td,tr{display:block}
+    thead{display:none}
+    tr{margin-bottom:12px}
+    td{border:none;text-align:right;position:relative;padding-left:50%;}
+    td::before{content:attr(data-label);position:absolute;left:12px;width:45%;text-align:left;font-weight:600}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Comisiones</h1>
+    <div class="toolbar">
+      <div style="display:flex;gap:8px;">
+        <button onclick="location.href='index.html'">Nueva Comisión</button>
+        <button id="refresh">Actualizar</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="buscar" placeholder="Buscar por nombre u oficio..." />
+        <div class="pager">
+          <button id="prev">« Anterior</button>
+          <span id="page">1</span>
+          <button id="next">Siguiente »</button>
+        </div>
+      </div>
+    </div>
+
+    <table aria-live="polite">
+      <thead>
+        <tr>
+          <th>Oficio</th>
+          <th>Nombre</th>
+          <th>Fechas de comisión</th>
+          <th>Lugar</th>
+          <th>Total Ant</th>
+          <th>Total Dev</th>
+          <th>Diferencia</th>
+          <th>Editar</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="8">Cargando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+<script>
+/* CONFIG - pon aquí tu URL /exec confirmada */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLiH6ZGKtM_UH_2PTdzHNffqWmpJI5HmsGgO4uJYtiS4JvpLXzA73FKzoqXVmQ_TSZ9w/exec";
+
+let start = 0, pageSize = 20;
+
+function addJSONP(q){ const s=document.createElement('script'); s.src = SCRIPT_URL + q; document.body.appendChild(s); }
+
+function loadPage(){
+  document.getElementById('tbody').innerHTML = '<tr><td colspan="8">Cargando...</td></tr>';
+  addJSONP('?historial=1&start='+start+'&callback=onHist');
+}
+
+function onHist(res){
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  if (!res || !res.rows || res.rows.length===0){
+    tbody.innerHTML = '<tr><td colspan="8">Sin registros</td></tr>';
+    document.getElementById('page').textContent = (start/pageSize)+1;
+    return;
+  }
+  res.rows.forEach(r=>{
+    const diff = Number(r[6]||0);
+    const cls = diff > 0 ? 'diff-positive' : (diff < 0 ? 'diff-negative' : 'diff-zero');
+    // formato contable: +$1,234.56 | -$22.00 | 0.00
+    const fmt = (n) => {
+      const abs = Math.abs(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
+      if (n > 0) return '+' + '$' + abs;
+      if (n < 0) return '-' + '$' + abs;
+      return '0.00';
+    };
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td data-label="Oficio">${r[0]}</td>
+      <td data-label="Nombre">${r[1]}</td>
+      <td data-label="Fechas">${r[2]}</td>
+      <td data-label="Lugar">${r[3]}</td>
+      <td data-label="Total Ant">${Number(r[4]||0).toLocaleString('es-MX',{minimumFractionDigits:2})}</td>
+      <td data-label="Total Dev">${Number(r[5]||0).toLocaleString('es-MX',{minimumFractionDigits:2})}</td>
+      <td data-label="Diferencia" class="${cls}">${fmt(Number(r[6]||0))}</td>
+      <td data-label="Editar"><button class="btn-edit" onclick="goEdit('${encodeURIComponent(r[0])}')">Editar</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('page').textContent = (start/pageSize)+1;
+}
+
+function goEdit(oficio){
+  const dec = decodeURIComponent(oficio);
+  location.href = 'edit.html?oficio=' + encodeURIComponent(dec);
+}
+
+document.getElementById('next').addEventListener('click', ()=>{ start += pageSize; loadPage(); });
+document.getElementById('prev').addEventListener('click', ()=>{ if (start >= pageSize) start -= pageSize; loadPage(); });
+document.getElementById('refresh').addEventListener('click', () => loadPage());
+document.getElementById('buscar').addEventListener('input', function(){
+  const term = this.value.toLowerCase();
+  document.querySelectorAll('#tbody tr').forEach(tr => {
+    tr.style.display = tr.innerText.toLowerCase().includes(term) ? '' : 'none';
+  });
+});
+
+loadPage();
+</script>
+</body>
+</html>
