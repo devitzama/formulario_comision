@@ -38,6 +38,7 @@
       <div style="display:flex;gap:8px;">
         <button onclick="location.href='index.html'">Nueva Comisión</button>
         <button id="refresh">Actualizar</button>
+        <button id="salir" onclick="logout()" style="margin-left:auto;">Salir</button>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
         <input id="buscar" placeholder="Buscar por nombre u oficio..." />
@@ -66,11 +67,22 @@
         <tr><td colspan="8">Cargando...</td></tr>
       </tbody>
     </table>
+    
   </div>
 
 <script>
+
+function checkSession(){
+  const s = JSON.parse(localStorage.getItem("session") || "{}");
+  if(!s.usuario || !s.rol || !s.exp) return location.href="login.html";
+  if(Date.now() > s.exp){
+    localStorage.removeItem("session");
+    return location.href="login.html";
+  }
+}
+checkSession();
 /* CONFIG - pon aquí tu URL /exec confirmada */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLiH6ZGKtM_UH_2PTdzHNffqWmpJI5HmsGgO4uJYtiS4JvpLXzA73FKzoqXVmQ_TSZ9w/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwax7IHudPuBzVilnAxdlTbB0xQXF-WgzRtwNkQBTSvU3dllWIKOjzs8-iME312CqlzKg/exec";
 
 let start = 0, pageSize = 20;
 
@@ -131,6 +143,10 @@ document.getElementById('buscar').addEventListener('input', function(){
 });
 
 loadPage();
+function logout(){
+  localStorage.removeItem("session");
+  location.href="login.html";
+}
 </script>
 </body>
 </html>
