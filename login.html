@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Iniciar Sesión</title>
+<link rel="stylesheet" href="style.css"> 
+<style>
+  body{font-family:Inter,system-ui;background:#f3f6f8;margin:0;padding:20px;color:#0b1823}
+  .card{max-width:380px;margin:100px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+  h1{color:#0b63a7;text-align:center;margin-bottom:20px}
+  label{display:block;margin-top:10px;font-weight:600}
+  input{width:100%;padding:10px;margin-top:5px;border-radius:8px;border:1px solid #dce3ec}
+  button{width:100%;margin-top:20px;padding:10px;border:0;border-radius:8px;background:#0b63a7;color:#fff;font-weight:600;font-size:16px;cursor:pointer}
+  .error{color:#d00;font-size:13px;text-align:center;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Acceso</h1>
+  <label>Usuario</label>
+  <input id="usuario" autocomplete="username">
+
+  <label>Contraseña</label>
+  <input id="password" type="password" autocomplete="current-password">
+
+  <button onclick="login()">Ingresar</button>
+  <div id="msg" class="error"></div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwax7IHudPuBzVilnAxdlTbB0xQXF-WgzRtwNkQBTSvU3dllWIKOjzs8-iME312CqlzKg/exec";
+
+function login(){
+  const usuario = document.getElementById("usuario").value.trim();
+  const password = document.getElementById("password").value.trim();
+  if(!usuario || !password){
+    document.getElementById("msg").textContent = "Ingrese usuario y contraseña";
+    return;
+  }
+  document.getElementById("msg").textContent = "Verificando...";
+
+  // crear callback dinámico
+  const cbName = 'cbLogin' + Date.now();
+  window[cbName] = function(data){
+    try {
+      if (data && data.success) {
+        const exp = Date.now() + (8*60*60*1000); // 8 horas
+        localStorage.setItem("session", JSON.stringify({
+          usuario: usuario,
+          rol: data.rol,
+          exp: exp
+        }));
+        location.href = "index.html";
+      } else {
+        document.getElementById("msg").textContent = "❌ Usuario o contraseña incorrectos";
+      }
+    } finally {
+      // cleanup
+      const s = document.getElementById(cbName);
+      if (s) s.remove();
+      delete window[cbName];
+    }
+  };
+
+  const script = document.createElement('script');
+  script.id = cbName;
+  const qs = '?login=1&usuario=' + encodeURIComponent(usuario) + '&password=' + encodeURIComponent(password) + '&callback=' + cbName;
+  script.src = SCRIPT_URL + qs;
+  document.body.appendChild(script);
+}
+</script>
+
+</body>
+</html>
