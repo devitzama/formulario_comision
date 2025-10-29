@@ -208,95 +208,90 @@
   </div>
 
 <script>
-/* CONFIG: pega tu URL /exec aquí (ya la puse por ti) */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyuqDDM8HOMS3penfSF-zpo--UlGmvX2tiXZIUp73O_8hJvxRKqvQniiyDZmPo91w7JHg/exec";
-
-/* Helpers */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLiH6ZGKtM_UH_2PTdzHNffqWmpJI5HmsGgO4uJYtiS4JvpLXzA73FKzoqXVmQ_TSZ9w/exec";
 const $ = id => document.getElementById(id);
-const toMoneyStr = n => Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
-const capitalize = s => (s||"").toString().trim().toLowerCase().split(/\s+/).map(w => w[0]? w[0].toUpperCase()+w.slice(1):"").join(" ");
 
-/* Inicializa fechas locales */
-(function initDates() {
-  const now = new Date();
-  const offset = now.getTimezoneOffset()*60000;
-  const local = new Date(now.getTime()-offset);
-  $('fecha').value = local.toISOString().slice(0,10);
-  $('fechaInicio').value = local.toISOString().slice(0,10);
-  $('fechaFin').value = local.toISOString().slice(0,10);
-  $('fechaComp').value = local.toISOString().slice(0,10);
-  $('fechaAnt').value = local.toISOString().slice(0,10);
-})();
-
-/* Cargar sugerencias y siguiente oficio */
-async function loadSuggestionsAndNext() {
-  try {
-    const s = await fetch(SCRIPT_URL + '?suggestions=1');
-    const suggestions = await s.json();
-    // fill datalists with capitalized unique values
-    function fillDL(id, arr) {
-      const dl = $(id);
-      dl.innerHTML = "";
-      (arr||[]).forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v;
-        dl.appendChild(opt);
-      });
-    }
-    fillDL('dlNombre', suggestions.nombre);
-    fillDL('dlPuesto', suggestions.puesto);
-    fillDL('dlLugar', suggestions.lugar);
-    fillDL('dlMotivo', suggestions.motivo);
-    fillDL('dlRegion', suggestions.region);
-    fillDL('dlMarca', suggestions.marca);
-    fillDL('dlModelo', suggestions.modelo);
-    fillDL('dlPlaca', suggestions.placa);
-    fillDL('dlAutoriza', suggestions.autoriza);
-    fillDL('dlPuestoAutoriza', suggestions.puesto_autoriza);
-    fillDL('dlVoBo', suggestions.vobo);
-    fillDL('dlPuestoVoBo', suggestions.puesto_vobo);
-
-    // obtener siguiente oficio
-    const m = await fetch(SCRIPT_URL + '?maxoficio=1');
-    const mj = await m.json();
-    $('oficio').value = mj.next || "1";
-  } catch (err) {
-    console.warn('No se pudieron cargar sugerencias/next:', err);
+// ===== JSONP: obtener max oficio =====
+function onMaxOficio(res){
+  if(res && res.next){
+    $('oficio').value = res.next;
+  } else {
     $('oficio').value = "1";
   }
 }
-
-/* fechas de comisión + dias (auto) */
-function updateFechasYDias(){
-  const f1 = $('fechaInicio').value;
-  const f2 = $('fechaFin').value;
-  if (f1 && f2) {
-    const d1 = new Date(f1), d2 = new Date(f2);
-    if (!isNaN(d1.getTime()) && !isNaN(d2.getTime())) {
-      const months = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-      const f1L = d1.getDate() + " de " + months[d1.getMonth()] + " de " + d1.getFullYear();
-      const f2L = d2.getDate() + " de " + months[d2.getMonth()] + " de " + d2.getFullYear();
-      $('fechasComision').value = f1L + " al " + f2L;
-      const diff = Math.round((d2 - d1)/(1000*60*60*24)) + 1;
-      $('diasComision').value = diff >= 0 ? diff : 0;
-      return;
-    }
-  }
-  $('fechasComision').value = "";
-  $('diasComision').value = "";
+function loadMaxOficio(){
+  const s = document.createElement('script');
+  s.src = SCRIPT_URL + "?maxoficio=1&callback=onMaxOficio";
+  document.body.appendChild(s);
 }
 
-/* totales */
-function updateTotales() {
-  const antIds = ['antAlim','antHosp','antComb','antPeaje','antPas','antOtros'];
-  const devIds = ['devAlim','devHosp','devComb','devPeaje','devPas','devOtros'];
-  let totalA = 0, totalD = 0;
-  antIds.forEach(id => totalA += Number($(id).value || 0));
-  devIds.forEach(id => totalD += Number($(id).value || 0));
-  $('totalAntDisplay').textContent = '$' + toMoneyStr(totalA);
-  $('totalDevDisplay').textContent = '$' + toMoneyStr(totalD);
-  // fechaAnt behavior
-  if (totalA > 0) {
+// ===== JSONP: sugerencias =====
+function onSuggestions(res){
+  const fill = (id, arr) => {
+    const dl = $(id);
+    if(!dl) return;
+    dl.innerHTML = "";
+    (arr||[]).forEach(v=>{
+      const opt=document.createElement('option');
+      opt.value=v;
+      dl.appendChild(opt);
+    });
+  };
+
+  fill('dlNombre',res.nombre);
+  fill('dlPuesto',res.puesto);
+  fill('dlLugar',res.lugar);
+  fill('dlMotivo',res.motivo);
+  fill('dlRegion',res.region);
+  fill('dlMarca',res.marca);
+  fill('dlModelo',res.modelo);
+  fill('dlPlaca',res.placa);
+  fill('dlAutoriza',res.autoriza);
+  fill('dlPuestoAutoriza',res.puesto_autoriza);
+  fill('dlVoBo',res.vobo);
+  fill('dlPuestoVoBo',res.puesto_vobo);
+}
+function loadSuggestions(){
+  const s = document.createElement('script');
+  s.src = SCRIPT_URL + "?suggestions=1&callback=onSuggestions";
+  document.body.appendChild(s);
+}
+
+// ===== Fechas iniciales =====
+function setInitialDates(){
+  const now = new Date();
+  const offset = now.getTimezoneOffset()*60000;
+  const local = new Date(now.getTime()-offset);
+  const d = local.toISOString().slice(0,10);
+  $('fecha').value = d;
+  $('fechaInicio').value = d;
+  $('fechaFin').value = d;
+  $('fechaComp').value = d;
+  $('fechaAnt').value = d;
+}
+
+// ===== Fechas comisión y días =====
+function updateFechas(){
+  const f1 = $('fechaInicio').value;
+  const f2 = $('fechaFin').value;
+  if(f1 && f2){
+    const d1 = new Date(f1), d2 = new Date(f2);
+    const diff = Math.round((d2 - d1)/(1000*60*60*24))+1;
+    $('diasComision').value = diff > 0 ? diff : 0;
+  }
+}
+
+// ===== Totales =====
+function updateTotales(){
+  const idsA = ['antAlim','antHosp','antComb','antPeaje','antPas','antOtros'];
+  const idsD = ['devAlim','devHosp','devComb','devPeaje','devPas','devOtros'];
+  let tA=0,tD=0;
+  idsA.forEach(i=>tA+=Number($(i).value||0));
+  idsD.forEach(i=>tD+=Number($(i).value||0));
+  $('totalAntDisplay').textContent = '$' + tA.toFixed(2);
+  $('totalDevDisplay').textContent = '$' + tD.toFixed(2);
+
+  if(tA>0){
     $('fechaAnt').value = $('fecha').value;
     $('fechaAnt').readOnly = true;
   } else {
@@ -304,72 +299,63 @@ function updateTotales() {
   }
 }
 
-/* vehiculo official toggle */
-function toggleVehiculo() {
-  const disable = $('medio').value !== "Vehículo Oficial";
-  ['marca','modelo','placa'].forEach(id => {
-    $(id).disabled = disable;
-    if (disable) { $(id).value = ""; }
-  });
+// ===== Vehículo oficial toggler =====
+function toggleVehiculo(){
+  const dis = $('medio').value !== "Vehículo Oficial";
+  ['marca','modelo','placa'].forEach(id=>{ $(id).disabled=dis; if(dis) $(id).value=""; });
 }
 
-/* submit - use URLSearchParams to avoid preflight */
-document.getElementById('form').addEventListener('submit', async function(e){
+// ===== Validar oficio =====
+function ensureOficio(){
+  const val = $('oficio').value.trim();
+  return val.length>0;
+}
+
+// ===== Guardar =====
+$('form').addEventListener('submit', async e=>{
   e.preventDefault();
-  // collect form data
-  const fm = new FormData(this);
-  // include totals
-  const totalAntNum = ['antAlim','antHosp','antComb','antPeaje','antPas','antOtros'].reduce((s,id)=>s+Number($(id).value||0),0);
-  const totalDevNum = ['devAlim','devHosp','devComb','devPeaje','devPas','devOtros'].reduce((s,id)=>s+Number($(id).value||0),0);
-  fm.set('total_antic', totalAntNum);
-  fm.set('total_dev', totalDevNum);
 
-  // ensure ISO dates are sent (yyyy-mm-dd) for server detection
-  // the date inputs already provide ISO; for readonly fields server will compute long versions
-  const params = new URLSearchParams();
-  for (const [k,v] of fm.entries()) params.append(k, v);
+  if(!ensureOficio()){
+    alert("⚠️ El número de oficio es requerido");
+    return;
+  }
 
-  try {
-    const resp = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      // headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: params
-    });
-    if (!resp.ok) throw new Error("HTTP status "+ resp.status);
-    const json = await resp.json();
-    if (json.success) {
-      alert('✅ Guardado correctamente');
-      this.reset();
-      // reset dates and reload suggestions/next
-      (function resetDates(){ const now=new Date(); const off=now.getTimezoneOffset()*60000; const local=new Date(now.getTime()-off); $('fecha').value=local.toISOString().slice(0,10); $('fechaInicio').value=local.toISOString().slice(0,10); $('fechaFin').value=local.toISOString().slice(0,10); $('fechaComp').value=local.toISOString().slice(0,10); $('fechaAnt').value=local.toISOString().slice(0,10);} )();
-      updateTotales(); updateFechasYDias(); toggleVehiculo();
-      loadSuggestionsAndNext();
-    } else {
-      if (json.error === 'oficio_duplicado') alert('❌ El número de oficio ya existe. Cambia el número o edita ese oficio.');
-      else alert('❌ Error: ' + (json.error || 'desconocido'));
-    }
-  } catch (err) {
-    console.error('Error guardando:', err);
-    alert('Error al guardar (ver consola).');
+  const fd = new FormData(e.target);
+  fd.set("_method","create");
+
+  const r = await fetch(SCRIPT_URL, { method:"POST", body:fd });
+  const j = await r.json().catch(()=>({}));
+
+  if(j.success){
+    alert("✅ Guardado correctamente");
+    e.target.reset();
+    setInitialDates();
+    updateTotales();
+    updateFechas();
+    loadMaxOficio();
+    loadSuggestions();
+  } else {
+    alert("❌ Error: "+(j.error||'desconocido'));
   }
 });
 
-/* events */
-['fechaInicio','fechaFin'].forEach(id => $(id).addEventListener('change', updateFechasYDias));
-['antAlim','antHosp','antComb','antPeaje','antPas','antOtros','devAlim','devHosp','devComb','devPeaje','devPas','devOtros','fecha'].forEach(id=>{
-  const el = $(id);
-  if (el) el.addEventListener('input', updateTotales);
-});
-$('medio').addEventListener('change', toggleVehiculo);
-
-/* inicial */
-loadSuggestionsAndNext();
-toggleVehiculo();
-updateFechasYDias();
+// ===== Inicializar =====
+setInitialDates();
+loadMaxOficio();
+loadSuggestions();
+updateFechas();
 updateTotales();
+toggleVehiculo();
+
+['fechaInicio','fechaFin'].forEach(id=>$(id).addEventListener('change',updateFechas));
+['antAlim','antHosp','antComb','antPeaje','antPas','antOtros','devAlim','devHosp','devComb','devPeaje','devPas','devOtros','fecha'].forEach(id=>{
+  $(id).addEventListener('input',updateTotales);
+});
+$('medio').addEventListener('change',toggleVehiculo);
 </script>
 </body>
 </html>
+
 
 
 
