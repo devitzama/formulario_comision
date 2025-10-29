@@ -203,12 +203,23 @@
       <div class="actions">
         <button type="submit">Guardar</button>
         <button type="button" class="ghost" onclick="location.href='historial.html'">Ver comisiones</button>
+        <button id="salir" onclick="logout()" style="margin-left:auto;">Salir</button>
       </div>
     </form>
   </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLiH6ZGKtM_UH_2PTdzHNffqWmpJI5HmsGgO4uJYtiS4JvpLXzA73FKzoqXVmQ_TSZ9w/exec";
+
+function checkSession(){
+  const s = JSON.parse(localStorage.getItem("session") || "{}");
+  if(!s.usuario || !s.rol || !s.exp) return location.href="login.html";
+  if(Date.now() > s.exp){
+    localStorage.removeItem("session");
+    return location.href="login.html";
+  }
+}
+checkSession();
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwax7IHudPuBzVilnAxdlTbB0xQXF-WgzRtwNkQBTSvU3dllWIKOjzs8-iME312CqlzKg/exec";
 const $ = id => document.getElementById(id);
 
 // ===== JSONP: obtener max oficio =====
@@ -352,9 +363,14 @@ toggleVehiculo();
   $(id).addEventListener('input',updateTotales);
 });
 $('medio').addEventListener('change',toggleVehiculo);
+function logout(){
+  localStorage.removeItem("session");
+  location.href="login.html";
+}
 </script>
 </body>
 </html>
+
 
 
 
