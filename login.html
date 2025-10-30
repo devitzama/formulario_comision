@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Iniciar Sesión</title>
 <link rel="stylesheet" href="style.css"> 
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="shortcut icon" href="favicon.ico">
 <style>
-  body{font-family:Inter,system-ui;background:#f3f6f8;margin:0;padding:20px;color:#0b1823}
-  .card{max-width:380px;margin:100px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.08)}
-  h1{color:#0b63a7;text-align:center;margin-bottom:20px}
-  label{display:block;margin-top:10px;font-weight:600}
-  input{width:100%;padding:10px;margin-top:5px;border-radius:8px;border:1px solid #dce3ec}
-  button{width:100%;margin-top:20px;padding:10px;border:0;border-radius:8px;background:#0b63a7;color:#fff;font-weight:600;font-size:16px;cursor:pointer}
-  .error{color:#d00;font-size:13px;text-align:center;margin-top:10px}
+    .card{max-width:380px;margin:100px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+   .error{color:#d00;font-size:13px;text-align:center;margin-top:10px}
 </style>
 </head>
 <body>
-
+<div class="header-bar">
+  SUBSECRETARÍA DE EDUCACIÓN BÁSICA – MICHOACÁN
+</div>
 <div class="card">
+    <img src="logo.png" alt="Logo SEB" class="logo">
   <h1>Acceso</h1>
   <label>Usuario</label>
   <input id="usuario" autocomplete="username">
@@ -30,7 +30,17 @@
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwax7IHudPuBzVilnAxdlTbB0xQXF-WgzRtwNkQBTSvU3dllWIKOjzs8-iME312CqlzKg/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOB-68HNJbUPuwd1wDkPJDnrxPDAMWCsaOVFN8n6JIQWnXbqlwszOtJ3YQZIVzG3Dwvg/exec";
+
+const pswd = document.getElementById('password');
+
+pswd.addEventListener('keydown', function(event) {
+  // El código 13 corresponde a la tecla Enter
+  if (event.keyCode === 13) {
+    event.preventDefault(); // Evita que el formulario se envíe por defecto
+    login(); 
+  }
+});
 
 function login(){
   const usuario = document.getElementById("usuario").value.trim();
