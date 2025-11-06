@@ -158,86 +158,103 @@
       </div>
     </form>
   </div>
-
 <script>
-  
-function checkSession(){
-  const s = JSON.parse(localStorage.getItem("session") || "{}");
-  if(!s.usuario || !s.rol || !s.exp) return location.href="login.html";
-  if(Date.now() > s.exp){
-    localStorage.removeItem("session");
-    return location.href="login.html";
-  }
-}
-checkSession();
-const ses = JSON.parse(localStorage.getItem("session"));
-if(ses.rol !== "admin"){
-  document.querySelectorAll('input,select,textarea').forEach(el=>{
-    if(el.id !== "salir") el.disabled = true;
-  });
-  document.querySelector('button[type="submit"]').disabled = true;
-}
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOB-68HNJbUPuwd1wDkPJDnrxPDAMWCsaOVFN8n6JIQWnXbqlwszOtJ3YQZIVzG3Dwvg/exec";
+/* ----------------- EDIT.HTML: script corregido ------------------
+ 
+   Asegúrate de dejar intacto el HTML (inputs con los mismos IDs).
+*/
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOB-68HNJbUPuwd1wDkPJDnrxPDAMWCsaOVFN8n6JIQWnXbqlwszOtJ3YQZIVzG3Dwvg/exec"; // <- pon tu /exec aquí
 const $ = id => document.getElementById(id);
-const toMoney = n => Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:2});
 
-/* UTIL: convierte fecha larga en español "27 de octubre de 2025" -> ISO yyyy-mm-dd */
-function parseESLongToISO(s){
-  if(!s) return "";
-  const meses = {enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
-  const m = s.toString().match(/(\d{1,2})\s+de\s+([a-záéíóúñ]+)\s+de\s+(\d{4})/i);
-  if(!m) return "";
-  const d = Number(m[1]), mo = meses[m[2].toLowerCase()], y = Number(m[3]);
-  if (mo === undefined) return "";
-  const dt = new Date(y,mo,d);
-  return dt.toISOString().slice(0,10);
+// Normaliza/convierte fechas desde Google Sheets a yyyy-mm-dd para input[type=date]
+// Acepta: "yyyy-mm-dd", "dd/mm/yyyy", "d/m/yyyy", "27 de octubre de 2025", Date object, número serial
+function normalizeDate(raw){
+  if (raw === null || raw === undefined) return "";
+
+  // Si ya es Date object
+  if (Object.prototype.toString.call(raw) === "[object Date]" || raw instanceof Date) {
+    const d = new Date(raw.getTime());
+    return d.toISOString().slice(0,10);
+  }
+
+  // Si es número (posible serial)
+  if (typeof raw === "number") {
+    // Asumimos serial tipo Excel/Sheets: days since 1899-12-30 (approx)
+    const epoch = Date.UTC(1899,11,30); // 1899-12-30
+    const ms = Math.round(raw * 24 * 60 * 60 * 1000);
+    const d = new Date(epoch + ms);
+    if (!isNaN(d.getTime())) return d.toISOString().slice(0,10);
+  }
+
+  // Si es string
+  let s = String(raw).trim();
+  if (!s) return "";
+
+  // Caso ISO yyyy-mm-dd o yyyy-mm-ddTHH:MM:SSZ
+  const isoMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoMatch) return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+
+  // Caso dd/mm/yyyy o d/m/yyyy
+  const dmy = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (dmy) {
+    const day = dmy[1].padStart(2,"0");
+    const mon = dmy[2].padStart(2,"0");
+    const year = dmy[3];
+    return `${year}-${mon}-${day}`;
+  }
+
+  // Caso largo "27 de octubre de 2025" (acepta mayúsculas/minúsculas)
+  const long = s.toLowerCase().match(/^(\d{1,2})\s+de\s+([a-záéíóúñ]+)\s+de\s+(\d{4})$/i);
+  if (long) {
+    const meses = {
+      enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,
+      julio:7,agosto:8,septiembre:9,octubre:10,noviembre:11,diciembre:12
+    };
+    const day = String(long[1]).padStart(2,"0");
+    const monthName = long[2].toLowerCase();
+    const month = (meses[monthName] || 0);
+    const year = long[3];
+    if (month >= 1) {
+      return `${year}-${String(month).padStart(2,"0")}-${day}`;
+    }
+  }
+
+  // Caso con barra "-" tipo "27-10-2025"
+  const dash = s.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if (dash) {
+    const day = dash[1].padStart(2,'0');
+    const mon = dash[2].padStart(2,'0');
+    const yr = dash[3];
+    return `${yr}-${mon}-${day}`;
+  }
+
+  // Si todo falla, retorna vacío para no poner valor inválido al input
+  return "";
 }
 
-/* Añade un tag <script> para JSONP */
-function addJSONP(q){ const s=document.createElement('script'); s.src = SCRIPT_URL + q; document.body.appendChild(s); }
+// Función que recibe el objeto devuelto por ?get=OFICIO (callback JSONP) o fetch
+function onDataEdit(data){
+  if(!data) { alert("No se encontró el oficio"); return; }
 
-/* obtener param de URL */
-function getParam(name){ return new URLSearchParams(location.search).get(name); }
+  // campos básicos
+  $('oficio').value = data.oficio || "";
 
-/* Si cadena vacía -> devuelve ISO de hoy local */
-function todayISOIfEmpty(value){
-  if (value && value.toString().trim() !== "") return value;
-  const now = new Date();
-  const local = new Date(now.getTime() - now.getTimezoneOffset()*60000);
-  return local.toISOString().slice(0,10);
-}
-
-/* Cargar registro por oficio */
-function loadRecord(){
-  const oficio = getParam('oficio');
-  if(!oficio) { alert('Falta oficio en la URL'); return; }
-  // callback onData
-  addJSONP('?get=' + encodeURIComponent(oficio) + '&callback=onData');
-}
-
-/* Llenar campos con datos recibidos */
-function onData(data){
-  if(!data) return alert('No se encontró el oficio');
-
-  // oficio (readonly)
-  $('oficio').value = data.oficio || '';
-
-  // Fecha (largo)-> convertir a ISO para input; si no existe, usar hoy
-  $('fecha').value = todayISOIfEmpty(parseESLongToISO(data.fecha));
-
+  $('fecha').value = normalizeDate(data.fecha);
   $('tipo').value = data.tipo || 'base';
   $('nombre').value = data.nombre || '';
   $('puesto').value = data.puesto || '';
   $('region').value = data.region || '';
 
-  // fechas inicio/fin -> ISO; si faltan poner hoy
-  $('fechaInicio').value = todayISOIfEmpty(parseESLongToISO(data.fecha_inicio));
-  $('fechaFin').value = todayISOIfEmpty(parseESLongToISO(data.fecha_fin));
+  // fechas de comisión: fecha_inicio, fecha_fin (convertir antes de asignar)
+  $('fechaInicio').value = normalizeDate(data.fecha_inicio);
+  $('fechaFin').value = normalizeDate(data.fecha_fin);
 
-  // fechas de comision (texto largo), dias
+  // texto concatenado y días (si existen en la fila original, los usamos; si no, calculamos)
   $('fechasComision').value = data.fechas_comision || '';
   $('diasComision').value = data.dias_comision || '';
 
+  // resto de campos
   $('lugar').value = data.lugar || '';
   $('motivo').value = data.motivo || '';
   $('medio').value = data.medio_transporte || 'Vehículo Oficial';
@@ -248,110 +265,108 @@ function onData(data){
   $('puestoAutoriza').value = data.puesto_autoriza || '';
 
   // anticipados
-  $('antAlim').value = (data.alim_antic !== undefined && data.alim_antic !== '') ? data.alim_antic : 0;
-  $('antHosp').value = (data.hosp_antic !== undefined && data.hosp_antic !== '') ? data.hosp_antic : 0;
-  $('antComb').value = (data.comb_antic !== undefined && data.comb_antic !== '') ? data.comb_antic : 0;
-  $('antPeaje').value = (data.peaje_antic !== undefined && data.peaje_antic !== '') ? data.peaje_antic : 0;
-  $('antPas').value = (data.pasajes_antic !== undefined && data.pasajes_antic !== '') ? data.pasajes_antic : 0;
-  $('antOtros').value = (data.otros_antic !== undefined && data.otros_antic !== '') ? data.otros_antic : 0;
+  $('antAlim').value = data.alim_antic || 0;
+  $('antHosp').value = data.hosp_antic || 0;
+  $('antComb').value = data.comb_antic || 0;
+  $('antPeaje').value = data.peaje_antic || 0;
+  $('antPas').value = data.pasajes_antic || 0;
+  $('antOtros').value = data.otros_antic || 0;
 
   // devengados
-  $('devAlim').value = (data.alim_dev !== undefined && data.alim_dev !== '') ? data.alim_dev : 0;
-  $('devHosp').value = (data.hosp_dev !== undefined && data.hosp_dev !== '') ? data.hosp_dev : 0;
-  $('devComb').value = (data.comb_dev !== undefined && data.comb_dev !== '') ? data.comb_dev : 0;
-  $('devPeaje').value = (data.peaje_dev !== undefined && data.peaje_dev !== '') ? data.peaje_dev : 0;
-  $('devPas').value = (data.pasajes_dev !== undefined && data.pasajes_dev !== '') ? data.pasajes_dev : 0;
-  $('devOtros').value = (data.otros_dev !== undefined && data.otros_dev !== '') ? data.otros_dev : 0;
-  $('reintegro').checked = (data.reintegro_deposito);
+  $('devAlim').value = data.alim_dev || 0;
+  $('devHosp').value = data.hosp_dev || 0;
+  $('devComb').value = data.comb_dev || 0;
+  $('devPeaje').value = data.peaje_dev || 0;
+  $('devPas').value = data.pasajes_dev || 0;
+  $('devOtros').value = data.otros_dev || 0;
 
-  // fechaAnt, fechaComp: if missing set to today
-  $('fechaAnt').value = todayISOIfEmpty(parseESLongToISO(data.fecha_antic));
-  $('fechaComp').value = todayISOIfEmpty(parseESLongToISO(data.fecha_comprobacion));
+  // reintegro (puede venir TRUE/FALSE, true/false, "TRUE", "true")
+  const reinVal = String(data.reintegro_deposito || "").toLowerCase();
+  $('reintegro').checked = (reinVal === "true" || reinVal === "true" || reinVal === "1" || reinVal === "true");
 
+  // fechas de anticipo y comprobación
+  $('fechaAnt').value = normalizeDate(data.fecha_antic);
+  $('fechaComp').value = normalizeDate(data.fecha_comprobacion);
 
+  // recalcular totales y texto de fechas (si el usuario no desea que cambie, puede dejar vacío)
   updateTotalsAndDates();
   toggleVehiculo();
 }
 
-/* recalculo totales y fechas */
+// Cargar el registro vía JSONP (para evitar CORS)
+function loadRecordEdit(){
+  const oficio = new URLSearchParams(location.search).get('oficio');
+  if(!oficio) { alert("Falta oficio en la URL"); return; }
+  // crear callback dinámico por si acaso
+  const cb = "cb_edit_" + Date.now();
+  window[cb] = function(d){
+    try { onDataEdit(d); } finally { delete window[cb]; }
+  };
+  const s = document.createElement("script");
+  s.src = `${SCRIPT_URL}?get=${encodeURIComponent(oficio)}&callback=${cb}`;
+  document.body.appendChild(s);
+}
+
+/* --- helpers ya usados en tu edit (sin cambiar nombres de IDs) --- */
+function toggleVehiculo(){
+  const disable = $('medio').value !== "Vehículo Oficial";
+  ['marca','modelo','placa'].forEach(id => {
+    const el = $(id);
+    if (el) {
+      el.disabled = disable;
+      if (disable) el.value = el.value || "";
+    }
+  });
+}
+
 function updateTotalsAndDates(){
-  const antIds = ['antAlim','antHosp','antComb','antPeaje','antPas','antOtros'];
-  const devIds = ['devAlim','devHosp','devComb','devPeaje','devPas','devOtros'];
-  let tA = 0, tD = 0;
-  antIds.forEach(id => tA += Number($(id).value || 0));
-  devIds.forEach(id => tD += Number($(id).value || 0));
-  $('totalAntDisplay').textContent = '$' + toMoney(tA);
-  $('totalDevDisplay').textContent = '$' + toMoney(tD);
+  const idsAnt = ['antAlim','antHosp','antComb','antPeaje','antPas','antOtros'];
+  const idsDev = ['devAlim','devHosp','devComb','devPeaje','devPas','devOtros'];
+  const sum = (arr) => arr.reduce((s,id)=> s + Number( ( $(id) && $(id).value ) || 0 ), 0);
 
-  if (tA > 0) {
-    $('fechaAnt').value = $('fecha').value || todayISOIfEmpty();
-    $('fechaAnt').readOnly = true;
-  } else {
-    $('fechaAnt').readOnly = false;
-  }
+  const totalAnt = sum(idsAnt);
+  const totalDev = sum(idsDev);
+  const toMoney = x => Number(x||0).toLocaleString('es-MX',{minimumFractionDigits:2});
 
-  // fechas comisión y días
-  const f1 = $('fechaInicio').value, f2 = $('fechaFin').value;
-  if (f1 && f2) {
-    const [anio1, mes1, dia1] = f1.split('-').map(Number);
-    const [anio2, mes2, dia2] = f2.split('-').map(Number);
+  const taEl = document.getElementById('totalAntDisplay');
+  const tdEl = document.getElementById('totalDevDisplay');
+  if (taEl) taEl.textContent = '$' + toMoney(totalAnt);
+  if (tdEl) tdEl.textContent = '$' + toMoney(totalDev);
+
+  // fechas largas y dias si tienen valores en los inputs tipo date
+  const fi = $('fechaInicio').value, ff = $('fechaFin').value;
+  if (fi && ff) {
+    const [anio1, mes1, dia1] = fi.split('-').map(Number);
+    const [anio2, mes2, dia2] = ff.split('-').map(Number);
     const d1 = new Date(anio1, mes1 - 1, dia1);
     const d2 = new Date(anio2, mes2 - 1, dia2);
     if (!isNaN(d1.getTime()) && !isNaN(d2.getTime())) {
-      const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-      const f1L = d1.getDate() + " de " + meses[d1.getMonth()] + " de " + d1.getFullYear();
-      const f2L = d2.getDate() + " de " + meses[d2.getMonth()] + " de " + d2.getFullYear();
-      $('fechasComision').value = f1L + " al " + f2L;
-      const diff = Math.round((d2 - d1)/(1000*60*60*24)) + 1;
-      $('diasComision').value = diff >= 0 ? diff : 0;
+      const months = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+      $('fechasComision').value = `${d1.getDate()} de ${months[d1.getMonth()]} de ${d1.getFullYear()} al ${d2.getDate()} de ${months[d2.getMonth()]} de ${d2.getFullYear()}`;
+      const diffDays = Math.round((d2 - d1)/(1000*60*60*24)) + 1;
+      $('diasComision').value = diffDays >= 0 ? diffDays : '';
     }
   }
 }
 
-/* toggle vehiculo */
-function toggleVehiculo(){
-  const disable = $('medio').value !== "Vehículo Oficial";
-  ['marca','modelo','placa'].forEach(id => {
-    $(id).disabled = disable;
-    if (disable) $(id).value = $(id).value || "";
-  });
-}
-
-/* submit: actualizar (fecha comprobación se pone a hoy) */
-/* IMPORTANT: send URLSearchParams object as body (not string), so Apps Script receives parameters in e.parameter */
+/* submit (update) — se conserva tu flujo: se envía como URLSearchParams para evitar preflight */
 document.getElementById('form').addEventListener('submit', async function(e){
   e.preventDefault();
-
-  // Ensure oficio exists
-  const oficioVal = $('oficio').value && $('oficio').value.toString().trim();
-  if(!oficioVal){
-    alert('❌ Oficio vacío — no se puede actualizar');
-    return;
-  }
-
-  // preparar FormData (leer valores actuales)
   const fm = new FormData(this);
   fm.set('_method','update');
-
-  // recalcular totales por seguridad
-  const totalA = ['antAlim','antHosp','antComb','antPeaje','antPas','antOtros'].reduce((s,id)=>s+Number($(id).value||0),0);
-  const totalD = ['devAlim','devHosp','devComb','devPeaje','devPas','devOtros'].reduce((s,id)=>s+Number($(id).value||0),0);
-  fm.set('total_antic', totalA);
-  fm.set('total_dev', totalD);
   fm.set('reintegro_deposito', $('reintegro').checked ? 'TRUE' : 'FALSE');
 
-  // actualizar fecha_comprobacion a hoy (opción 1)
-  const now = new Date();
-  const localISO = new Date(now.getTime() - now.getTimezoneOffset()*60000).toISOString().slice(0,10);
-  fm.set('fecha_comprobacion', localISO);
+  // totales
+  const totalAnt = ['antAlim','antHosp','antComb','antPeaje','antPas','antOtros'].reduce((s,id)=> s + Number($(id).value||0),0);
+  const totalDev = ['devAlim','devHosp','devComb','devPeaje','devPas','devOtros'].reduce((s,id)=> s + Number($(id).value||0),0);
+  fm.set('total_antic', totalAnt);
+  fm.set('total_dev', totalDev);
 
-  // Convertir FormData a URLSearchParams (NO llamar .toString())
   const params = new URLSearchParams();
-  for (const pair of fm.entries()) params.append(pair[0], pair[1]);
+  for(const [k,v] of fm.entries()) params.append(k,v);
 
   try {
-    const resp = await fetch(SCRIPT_URL, { method:'POST', body: params }); // <--- enviar URLSearchParams DIRECTO
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const resp = await fetch(SCRIPT_URL, { method:'POST', body:params });
     const json = await resp.json();
     if (json.success) {
       alert('✅ Actualizado correctamente');
@@ -360,24 +375,20 @@ document.getElementById('form').addEventListener('submit', async function(e){
       alert('❌ Error: ' + (json.error || 'desconocido'));
     }
   } catch (err) {
-    console.error('Error al guardar:', err);
+    console.error(err);
     alert('Error al guardar (ver consola).');
   }
 });
 
 /* eventos */
-['antAlim','antHosp','antComb','antPeaje','antPas','antOtros','devAlim','devHosp','devComb','devPeaje','devPas','devOtros','fecha','fechaInicio','fechaFin'].forEach(id=>{
-  const el = $(id);
-  if (el) el.addEventListener('input', updateTotalsAndDates);
+['fechaInicio','fechaFin'].forEach(id => { if($(id)) $(id).addEventListener('change', updateTotalsAndDates); });
+['antAlim','antHosp','antComb','antPeaje','antPas','antOtros','devAlim','devHosp','devComb','devPeaje','devPas','devOtros'].forEach(id=>{
+  if($(id)) $(id).addEventListener('input', updateTotalsAndDates);
 });
 $('medio').addEventListener('change', toggleVehiculo);
 
 /* inicio */
-loadRecord();
-function logout(){
-  localStorage.removeItem("session");
-  location.href="login.html";
-}
+loadRecordEdit();
 </script>
 </body>
 </html>
