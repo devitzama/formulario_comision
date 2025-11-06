@@ -26,131 +26,475 @@
     td{border:none;text-align:right;position:relative;padding-left:50%;}
     td::before{content:attr(data-label);position:absolute;left:12px;width:45%;text-align:left;font-weight:600}
   }
+  .download-menu { position: relative; }
+
+.dropdown { position: relative; display: inline-block; }
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  border-radius: 8px;
+  min-width: 180px;
+  z-index: 50;
+  text-align: left;
+}
+
+.dropdown-content a {
+  color: #0b1823;
+  padding: 8px 12px;
+  text-decoration: none;
+  display: block;
+  font-size: 14px;
+}
+
+.dropdown-content a:hover {
+  background: #eef5fb;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.btn-download {
+  background: #8c0000;
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  font-size: 18px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+#loaderOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(3px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 99999;
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+}
+
+.spinner {
+  border: 6px solid rgba(255,255,255,0.2);
+  border-top: 6px solid #ffffff;
+  border-radius: 50%;
+  width: 55px;
+  height: 55px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* alineación de opción: ícono || checkbox + texto */
+.dropdown-content .option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+}
+
+.dropdown-content label.menu-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dropdown-content input[type="checkbox"] {
+  transform: scale(1.05);
+  margin: 0;
+}
+
+.download-single {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.05em;
+  padding: 2px 6px;
+  line-height: 1;
+  color: #007bff;
+}
+
+.download-single:hover { color: #0056b3; }
+
+/* ajustar ancho mínimo del dropdown para que no rompa la línea */
+.dropdown-content {
+  min-width: 220px;
+}
 </style>
 </head>
 <body>
-  <div class="header-bar">
-  SUBSECRETARÍA DE EDUCACIÓN BÁSICA – MICHOACÁN
-</div>
-  <div class="card">
-    <img src="logo.png" alt="Logo SEB" class="logo">
-    <h1>Comisiones</h1>
-    <div class="toolbar">
-      <div style="display:flex;gap:8px;">
-        <button onclick="location.href='index.html'">Nueva Comisión</button>
-        <button id="refresh">Actualizar</button>
-        <button id="salir" onclick="logout()" style="margin-left:auto;">Salir</button>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input id="buscar" placeholder="Buscar por nombre u oficio..." />
-        <div class="pager">
-          <button id="prev">«Anterior</button>
-          <span id="page">1</span>
-          <button id="next">Siguiente»</button>
-        </div>
-      </div>
-    </div>
 
-    <table aria-live="polite">
-      <thead>
-        <tr>
-          <th>Oficio</th>
-          <th>Nombre</th>
-          <th>Fechas de comisión</th>
-          <th>Lugar</th>
-          <th>Total Ant</th>
-          <th>Total Dev</th>
-          <th>Diferencia</th>
-          <th title="Reintegro/Depósito/Comprobado">R/D</th>
-          <th>Editar</th>
-        </tr>
-      </thead>
-      <tbody id="tbody">
-        <tr><td colspan="8">Cargando...</td></tr>
-      </tbody>
-    </table>
-    
+<div class="header-bar">SUBSECRETARÍA DE EDUCACIÓN BÁSICA – MICHOACÁN</div>
+<div class="card">
+
+<img src="logo.png" class="logo">
+
+<h1>Comisiones</h1>
+
+<div class="toolbar">
+  <button onclick="location.href='index.html'">Nueva Comisión</button>
+  <button id="refresh">Actualizar</button>
+  <button id="salir" onclick="logout()">Salir</button>
+  <input id="buscar" placeholder="Buscar...">
+  <select id="filtroRein">
+    <option value="all">Todos</option>
+    <option value="true">✅ Con reintegro</option>
+    <option value="false">❌ Sin reintegro</option>
+  </select>
+
+  <div class="pager">
+    <button id="prev">«Anterior</button>
+    <span id="page">1</span>
+    <button id="next">Siguiente»</button>
   </div>
+</div>
+
+<table aria-live="polite">
+<thead>
+<tr>
+  <th>Oficio</th>
+  <th>Nombre</th>
+  <th>Fechas de comisión</th>
+  <th>Lugar</th>
+  <th>Total Ant</th>
+  <th>Total Dev</th>
+  <th>Diferencia</th>
+  <th>R/D</th>
+  <th>Editar</th>
+  <th>Descargar</th>
+</tr>
+</thead>
+
+<tbody id="tbody">
+  <tr><td colspan="10">Cargando...</td></tr>
+</tbody>
+</table>
+</div>
 
 <script>
-
+checkSession();
 function checkSession(){
-  const s = JSON.parse(localStorage.getItem("session") || "{}");
-  if(!s.usuario || !s.rol || !s.exp) return location.href="login.html";
-  if(Date.now() > s.exp){
+  const s=JSON.parse(localStorage.getItem("session")||"{}");
+  if(!s.usuario || !s.rol || Date.now()>s.exp){
     localStorage.removeItem("session");
-    return location.href="login.html";
+    location.href="login.html";
   }
 }
-checkSession();
-/* CONFIG - pon aquí tu URL /exec confirmada */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOB-68HNJbUPuwd1wDkPJDnrxPDAMWCsaOVFN8n6JIQWnXbqlwszOtJ3YQZIVzG3Dwvg/exec";
 
-let start = 0, pageSize = 20;
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyOB-68HNJbUPuwd1wDkPJDnrxPDAMWCsaOVFN8n6JIQWnXbqlwszOtJ3YQZIVzG3Dwvg/exec";
+const SCRIPT_GEN_URL="https://script.google.com/macros/s/AKfycbwQ29HHmicmqYSs8kc7zXvHdiJtxdAPLjTOusGW-Xx-DKN_zcmJodlU-ny9t-6oahdx/exec";
 
-function addJSONP(q){ const s=document.createElement('script'); s.src = SCRIPT_URL + q; document.body.appendChild(s); }
+let start=0, pageSize=20;
+
+function addJSONP(q){
+  const s=document.createElement("script");
+  s.src=SCRIPT_URL+q;
+  document.body.appendChild(s);
+}
 
 function loadPage(){
-  document.getElementById('tbody').innerHTML = '<tr><td colspan="8">Cargando...</td></tr>';
-  addJSONP('?historial=1&start='+start+'&callback=onHist');
+  document.getElementById("tbody").innerHTML='<tr><td colspan="10">Cargando...</td></tr>';
+  addJSONP(`?historial=1&start=${start}&callback=onHist`);
+}
+
+function formatoFechaLarga(s){
+  if(!s) return "";
+  if(s.includes(" al ")) return s; // ya es rango
+  const d=new Date(s);
+  if(isNaN(d)) return s;
+  return d.toLocaleDateString("es-MX",{day:"numeric",month:"long",year:"numeric"});
 }
 
 function onHist(res){
-  const tbody = document.getElementById('tbody');
-  tbody.innerHTML = '';
-  if (!res || !res.rows || res.rows.length===0){
-    tbody.innerHTML = '<tr><td colspan="9">Sin registros</td></tr>';
-    document.getElementById('page').textContent = (start/pageSize)+1;
+  const tbody=document.getElementById("tbody");
+  tbody.innerHTML="";
+
+  if(!res.rows || res.rows.length===0){
+    tbody.innerHTML='<tr><td colspan="10">Sin registros</td></tr>';
     return;
   }
+
   res.rows.forEach(r=>{
-    const diff = Number(r[6]||0);
-    const reintegro = (String(r[7]).toLowerCase() === "true") ? "✅" : "❌";
-    const cls = diff > 0 ? 'diff-positive' : (diff < 0 ? 'diff-negative' : 'diff-zero');
-    // formato contable: +$1,234.56 | -$22.00 | 0.00
-    const fmt = (n) => {
-      const abs = Math.abs(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
-      if (n > 0) return '+' + '$' + abs;
-      if (n < 0) return '-' + '$' + abs;
-      return '0.00';
-    };
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td data-label="Oficio">${r[0]}</td>
-      <td data-label="Nombre">${r[1]}</td>
-      <td data-label="Fechas">${r[2]}</td>
-      <td data-label="Lugar">${r[3]}</td>
-      <td data-label="Total Ant">${Number(r[4]||0).toLocaleString('es-MX',{minimumFractionDigits:2})}</td>
-      <td data-label="Total Dev">${Number(r[5]||0).toLocaleString('es-MX',{minimumFractionDigits:2})}</td>
-      <td data-label="Diferencia" class="${cls}">${fmt(Number(r[6]||0))}</td>
-      <td style="font-size:18px;text-align:center">${reintegro}</td>
-      <td data-label="Editar"><button class="btn-edit" onclick="goEdit('${encodeURIComponent(r[0])}')">Editar</button></td>
+    const diff=Number(r[6]||0);
+    const cls=diff>0?'diff-positive':diff<0?'diff-negative':'diff-zero';
+
+    const fechas=formatarFechas(r[2]);
+
+    const rein=(String(r[7]).toLowerCase()==="true")?"✅":"❌";
+
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${r[0]}</td>
+      <td>${r[1]}</td>
+      <td>${fechas}</td>
+      <td>${r[3]}</td>
+      <td>${Number(r[4]||0).toLocaleString('es-MX',{minimumFractionDigits:2})}</td>
+      <td>${Number(r[5]||0).toLocaleString('es-MX',{minimumFractionDigits:2})}</td>
+      <td class="${cls}">${diff.toLocaleString('es-MX',{minimumFractionDigits:2})}</td>
+      <td>${rein}</td>
+      <td><button onclick="goEdit('${encodeURIComponent(r[0])}')">✏️</button></td>
+      <td data-label="Descargar" class="download-menu">
+        <div class="dropdown">
+          <button title="Descargar documentos" class="btn-download">📥</button>
+          <!-- <-- important: data-oficio para identificar la fila -->
+          <div class="dropdown-content" onclick="event.stopPropagation()" data-oficio="${r[0]}">
+            <div class="option">
+              <button class="download-single" data-type="oficio" title="Descargar Oficio">⬇️</button>
+              <label class="menu-option"><input type="checkbox" value="oficio"> 📄 Oficio</label>
+            </div>
+            <div class="option">
+              <button class="download-single" data-type="recibo" title="Descargar Recibo">⬇️</button>
+              <label class="menu-option"><input type="checkbox" value="recibo"> 💵 Recibo Anticipo</label>
+            </div>
+            <div class="option">
+              <button class="download-single" data-type="comprobacion" title="Descargar Comprobación">⬇️</button>
+              <label class="menu-option"><input type="checkbox" value="comprobacion"> 📑 Comprobación</label>
+            </div>
+            <div class="option">
+              <button class="download-single" data-type="formato_unico" title="Descargar Formato Único">⬇️</button>
+              <label class="menu-option"><input type="checkbox" value="formato_unico"> 🗂 Formato Único</label>
+            </div>
+            <div class="option">
+              <button class="download-single" data-type="alimentacion" title="Descargar Alimentación">⬇️</button>
+              <label class="menu-option"><input type="checkbox" value="alimentacion"> 🍽 Alimentación</label>
+            </div>
+            <hr style="margin:6px 0;">
+            <button onclick="downloadSelected(this,'${r[0]}');return false;" class="btn-combined">🧩 Generar ZIP</button>
+          </div>
+        </div>
+      </td>
     `;
     tbody.appendChild(tr);
   });
-  document.getElementById('page').textContent = (start/pageSize)+1;
+
+  document.getElementById("page").textContent=(start/pageSize)+1;
 }
 
-function goEdit(oficio){
-  const dec = decodeURIComponent(oficio);
-  location.href = 'edit.html?oficio=' + encodeURIComponent(dec);
+function formatarFechas(f){
+  if(!f) return "";
+  if(f.includes(" a ")||f.includes(" al ")) return f; // ya es rango
+  return formatoFechaLarga(f);
 }
 
-document.getElementById('next').addEventListener('click', ()=>{ start += pageSize; loadPage(); });
-document.getElementById('prev').addEventListener('click', ()=>{ if (start >= pageSize) start -= pageSize; loadPage(); });
-document.getElementById('refresh').addEventListener('click', () => loadPage());
-document.getElementById('buscar').addEventListener('input', function(){
-  const term = this.value.toLowerCase();
-  document.querySelectorAll('#tbody tr').forEach(tr => {
-    tr.style.display = tr.innerText.toLowerCase().includes(term) ? '' : 'none';
+function openMenu(btn,oficio){
+  closeMenu();
+
+  const m=document.createElement("div");
+  m.className="menu-box";
+  m.innerHTML=`
+    <button onclick="dl('${oficio}','oficio',this)">📄 Oficio</button>
+    <button onclick="dl('${oficio}','recibo',this)">💵 Recibo</button>
+    <button onclick="dl('${oficio}','comprobacion',this)">📑 Comprobación</button>
+    <button onclick="dl('${oficio}','formato',this)">🗂️ Formato Único</button>
+    <button onclick="dl('${oficio}','alimentacion',this)">🍽️ Alimentación</button>
+    <button onclick="dl('${oficio}','zip',this)">🧩 ZIP (Todos)</button>
+  `;
+  document.body.appendChild(m);
+
+  const r=btn.getBoundingClientRect();
+  m.style.left=r.left+"px";
+  m.style.top=(r.bottom+5)+"px";
+
+  document.addEventListener("click",closeMenu,{once:true});
+}
+
+function closeMenu(){
+  const old=document.querySelector(".menu-box");
+  if(old) old.remove();
+}
+
+// ✅ Mostrar/Ocultar loader
+function showLoader(show, msg="Generando documento...") {
+  const overlay = document.getElementById("loaderOverlay");
+  const text = document.getElementById("loaderText");
+  text.textContent = msg;
+  overlay.style.display = show ? "flex" : "none";
+}
+function genDoc(of,type,btn){
+  showLoader(true, "Generando " + type + "...");
+
+  const cb="cb"+Date.now();
+  window[cb]=resp=>{
+    showLoader(false);
+    if(resp.success) window.open(resp.url,"_blank");
+    delete window[cb];
+  };
+  
+  const s=document.createElement("script");
+  s.src=`${SCRIPT_GEN_URL}?oficio=${encodeURIComponent(of)}&type=${encodeURIComponent(type)}&callback=${cb}`;
+  document.body.appendChild(s);
+}
+
+function downloadSelected(btn, oficio){
+  // obtenemos el contenedor real (que ahora tiene data-oficio)
+  const dropdown = btn.closest(".dropdown-content");
+  const checks = [...dropdown.querySelectorAll("input:checked")].map(i => i.value);
+
+  console.log("downloadSelected -> oficio:", oficio, "checks:", checks);
+
+  if(checks.length === 0){
+    alert("Selecciona al menos un documento ✅");
+    return;
+  }
+
+  showLoader(true, "Generando ZIP...");
+
+  const cb = "cb_multi_" + Date.now();
+  window[cb] = (res) => {
+    showLoader(false);
+    console.log("callback", cb, "res:", res);
+
+    if(!res){
+      alert("❌ Respuesta vacía del servidor (ver consola).");
+      delete window[cb];
+      return;
+    }
+
+    if(!res.success){
+      alert("❌ Error al generar el ZIP: " + (res.error || "desconocido"));
+      console.error("server-error:", res);
+      delete window[cb];
+      return;
+    }
+
+    // Descargar automáticamente el ZIP
+    const a = document.createElement("a");
+    a.href = res.url;
+    a.download = ""; // nombre lo define el servidor
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    delete window[cb];
+  };
+
+  const multiParam = encodeURIComponent(JSON.stringify(checks));
+  const scriptUrl = `${SCRIPT_GEN_URL}?oficio=${encodeURIComponent(oficio)}&multi=${multiParam}&callback=${cb}`;
+  console.log("Inyectando JSONP script:", scriptUrl);
+
+  const s = document.createElement("script");
+  s.src = scriptUrl;
+  document.body.appendChild(s);
+}
+
+// 🔹 Descargar documento individual desde los iconos
+document.addEventListener('click', function (e) {
+  const btn = e.target.closest('.download-single');
+  if (!btn) return;
+
+  const type = btn.dataset.type;
+  const oficio = btn.closest('.dropdown-content')?.querySelector('.btn-combined')?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+
+  if (!oficio) return alert("No se encontró el número de oficio.");
+
+  showLoader(true, "Generando " + type + "...");
+
+  const cb = "cb_single_" + Date.now();
+  window[cb] = (res) => {
+    showLoader(false);
+    if (res.success) {
+      const a = document.createElement("a");
+      a.href = res.url;
+      a.download = "";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } else {
+      alert("❌ Error al generar: " + (res.error || "desconocido"));
+    }
+    delete window[cb];
+  };
+
+  const script = document.createElement("script");
+  script.src = `${SCRIPT_GEN_URL}?oficio=${encodeURIComponent(oficio)}&type=${encodeURIComponent(type)}&callback=${cb}`;
+  document.body.appendChild(script);
+});
+
+function goEdit(o){ location.href="edit.html?oficio="+encodeURIComponent(o); }
+
+// 🔹 Opcional: cuando tengamos ZIP funcionando
+function genAllDocs(oficio){
+  alert("ZIP de todos los documentos ➜ Será activado en la siguiente fase ✅");
+}
+
+document.getElementById("next").onclick=()=>{start+=pageSize;loadPage();}
+document.getElementById("prev").onclick=()=>{if(start>=pageSize) start-=pageSize;loadPage();}
+document.getElementById("buscar").oninput=function(){
+  const t=this.value.toLowerCase();
+  document.querySelectorAll("#tbody tr").forEach(tr=>{
+    tr.style.display=tr.innerText.toLowerCase().includes(t)?"":"none";
   });
+}
+document.getElementById("filtroRein").onchange=function(){
+  const v=this.value;
+  document.querySelectorAll("#tbody tr").forEach(tr=>{
+    const est=tr.children[7]?.innerText.trim();
+    tr.style.display=(v==="all")|| 
+                     (v==="true" && est==="✅")||
+                     (v==="false"&& est==="❌")? "":"none";
+  });
+}
+
+// Delegación: manejar click en los iconos de descarga individual
+document.addEventListener('click', function(evt){
+  const btn = evt.target.closest('.download-single');
+  if (!btn) return;
+
+  // ubicamos el dropdown-content contenedor con data-oficio
+  const dropdown = btn.closest('.dropdown-content');
+  const oficio = dropdown ? dropdown.dataset.oficio : null;
+  const type = btn.dataset.type;
+  if (!oficio || !type) {
+    return alert("No se pudo identificar el oficio o el tipo.");
+  }
+
+  showLoader(true, "Generando " + type + "...");
+
+  const cb = "cb_single_" + Date.now();
+  window[cb] = function(res){
+    showLoader(false);
+    if (res && res.success) {
+      const a = document.createElement("a");
+      a.href = res.url;
+      a.download = "";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } else {
+      alert("Error al generar documento: " + (res && res.error ? res.error : "desconocido"));
+      console.error("single-error", res);
+    }
+    delete window[cb];
+  };
+
+  const script = document.createElement("script");
+  script.src = `${SCRIPT_GEN_URL}?oficio=${encodeURIComponent(oficio)}&type=${encodeURIComponent(type)}&callback=${cb}`;
+  document.body.appendChild(script);
 });
 
 loadPage();
+
 function logout(){
   localStorage.removeItem("session");
   location.href="login.html";
 }
 </script>
+<!-- LOADER DE PANTALLA COMPLETA -->
+<div id="loaderOverlay">
+  <div class="spinner"></div>
+  <p id="loaderText">Generando documento...</p>
+</div>
 </body>
 </html>
