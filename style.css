@@ -102,3 +102,21 @@ button.ghost{background:#6b7280}
 .diff-negative{color:red;font-weight:bold;}
 .diff-zero{color:blue;font-weight:bold;}
 .readonly{background:#f5dada}
+
+.docs-cell {
+  display:flex;
+  gap:6px;
+  justify-content:center;
+}
+
+.doc-btn {
+  font-size:18px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.doc-btn:hover {
+  transform:scale(1.25);
+}
