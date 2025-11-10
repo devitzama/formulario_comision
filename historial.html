@@ -6,132 +6,266 @@
 <link rel="stylesheet" href="style.css">
 <title>Comisiones - Lista</title>
 <style>
-
-  body{font-family:Inter,system-ui,Arial;background:var(--bg);margin:0;padding:20px;color:#0b1823}
-  .wrap{max-width:1100px;margin:auto;background:#fff;padding:18px;border-radius:10px;box-shadow:0 6px 20px rgba(10,10,10,0.06)}
-  h1{color:var(--accent);margin:0}
-  .toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:12px}
-  input{padding:8px;border-radius:8px;border:1px solid #e6eef6}
-  table{width:100%;border-collapse:collapse;margin-top:12px}
-  th,td{padding:8px;border:1px solid #eef5fb;text-align:center;font-size:14px}
-  th{background:var(--accent);color:#fff}
-  .pager{display:flex;gap:8px;align-items:center;justify-content: flex-end}
-  button{padding:8px 12px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
-  .btn-edit{padding:6px 8px;border-radius:6px;border:0;cursor:pointer}
-  @media (max-width:800px){
-    .toolbar{flex-direction:column;align-items:stretch}
-    table,thead,tbody,th,td,tr{display:block}
-    thead{display:none}
-    tr{margin-bottom:12px}
-    td{border:none;text-align:right;position:relative;padding-left:50%;}
-    td::before{content:attr(data-label);position:absolute;left:12px;width:45%;text-align:left;font-weight:600}
+  body {
+    font-family: Inter, system-ui, Arial;
+    background: var(--bg);
+    margin: 0;
+    padding: 20px;
+    color: #0b1823;
   }
+
+  .wrap {
+    max-width: 1100px;
+    margin: auto;
+    background: #fff;
+    padding: 18px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(10,10,10,0.06);
+  }
+
+  h1 {
+    color: var(--accent);
+    margin: 0;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+
+  input {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #e6eef6;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+
+  th, td {
+    padding: 8px;
+    border: 1px solid #eef5fb;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  th {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .pager {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  button {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 0;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .btn-edit {
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 0;
+    cursor: pointer;
+  }
+
+  @media (max-width: 800px) {
+    .toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+    thead {
+      display: none;
+    }
+    tr {
+      margin-bottom: 12px;
+    }
+    td {
+      border: none;
+      text-align: right;
+      position: relative;
+      padding-left: 50%;
+    }
+    td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 12px;
+      width: 45%;
+      text-align: left;
+      font-weight: 600;
+    }
+  }
+
   .download-menu { position: relative; }
 
-.dropdown { position: relative; display: inline-block; }
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
 
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background: #fff;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-  border-radius: 8px;
-  min-width: 180px;
-  z-index: 50;
-  text-align: left;
-}
+  /* === Menú de descarga (abre hacia la izquierda) === */
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    right: 100%; /* 👈 se abre hacia la izquierda */
+    top: 0;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    border-radius: 10px;
+    min-width: 260px;
+    padding: 8px 0;
+    z-index: 9999;
+    text-align: left;
+  }
 
-.dropdown-content a {
-  color: #0b1823;
-  padding: 8px 12px;
-  text-decoration: none;
-  display: block;
-  font-size: 14px;
-}
+  /* Clase activa para mostrar menú con clic */
+  .dropdown-content.show {
+    display: block;
+  }
 
-.dropdown-content a:hover {
-  background: #eef5fb;
-}
+  /* Cada fila horizontal */
+  .dropdown-content .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
 
-.dropdown:hover .dropdown-content {
-  display: block;
-}
+  .dropdown-content .option:hover {
+    background: #f5f5f5;
+  }
 
-.btn-download {
-  background: #8c0000;
-  color: #fff;
-  border: 0;
-  border-radius: 6px;
-  font-size: 18px;
-  padding: 4px 10px;
-  cursor: pointer;
-}
-#loaderOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(3px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  z-index: 99999;
-  color: #fff;
-  font-size: 18px;
+  /* Ícono de descarga */
+  .download-single {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1em;
+    color: #007bff;
+    padding: 3px 6px;
+    line-height: 1;
+    transition: transform 0.2s, color 0.2s;
+    flex-shrink: 0;
+  }
+
+  .download-single:hover {
+    color: #0056b3;
+    transform: scale(1.15);
+  }
+
+  /* Checkbox */
+  .dropdown-content input[type="checkbox"] {
+    transform: scale(1.1);
+    margin: 0;
+    cursor: pointer;
+  }
+
+  /* Label + icono + texto */
+  .dropdown-content label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  .dropdown-header {
   text-align: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--accent);
+  background: #fdf3f3;
+  padding: 8px 0;
+  border-bottom: 2px solid var(--accent);
+  margin: -6px -10px 8px -10px; /* expande el fondo para que abarque todo el ancho del menú */
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+  /* === Botón Generar ZIP === */
+  .btn-combined {
+    width: calc(100% - 20px);
+    margin: 8px auto 6px auto;
+    display: block;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.25s, transform 0.2s;
+  }
 
-.spinner {
-  border: 6px solid rgba(255,255,255,0.2);
-  border-top: 6px solid #ffffff;
-  border-radius: 50%;
-  width: 55px;
-  height: 55px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 10px;
-}
+  .btn-combined:hover {
+    background: #a40000;
+    transform: scale(1.02);
+  }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-/* alineación de opción: ícono || checkbox + texto */
-.dropdown-content .option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-}
+  /* Botón principal 📥 */
+  .btn-download {
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    border-radius: 6px;
+    font-size: 18px;
+    padding: 4px 10px;
+    cursor: pointer;
+  }
 
-.dropdown-content label.menu-option {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  user-select: none;
-}
+  /* Loader */
+  #loaderOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(3px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 99999;
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+  }
 
-.dropdown-content input[type="checkbox"] {
-  transform: scale(1.05);
-  margin: 0;
-}
+  .spinner {
+    border: 6px solid rgba(255,255,255,0.2);
+    border-top: 6px solid #ffffff;
+    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+  }
 
-.download-single {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.05em;
-  padding: 2px 6px;
-  line-height: 1;
-  color: #007bff;
-}
-
-.download-single:hover { color: #0056b3; }
-
-/* ajustar ancho mínimo del dropdown para que no rompa la línea */
-.dropdown-content {
-  min-width: 220px;
-}
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 </style>
 </head>
 <body>
@@ -229,9 +363,7 @@ function onHist(res){
   res.rows.forEach(r=>{
     const diff=Number(r[6]||0);
     const cls=diff>0?'diff-positive':diff<0?'diff-negative':'diff-zero';
-
     const fechas=formatarFechas(r[2]);
-
     const rein=(String(r[7]).toLowerCase()==="true")?"✅":"❌";
 
     const tr=document.createElement("tr");
@@ -248,26 +380,26 @@ function onHist(res){
       <td data-label="Descargar" class="download-menu">
         <div class="dropdown">
           <button title="Descargar documentos" class="btn-download">📥</button>
-          <!-- <-- important: data-oficio para identificar la fila -->
-          <div class="dropdown-content" onclick="event.stopPropagation()" data-oficio="${r[0]}">
+          <div class="dropdown-content" data-oficio="${r[0]}" onclick="event.stopPropagation()">
+            <div class="dropdown-header">Oficio ${r[0]}</div>
             <div class="option">
-              <button class="download-single" data-type="oficio" title="Descargar Oficio">⬇️</button>
+              <button type="button" class="download-single" data-type="oficio">⬇️</button>
               <label class="menu-option"><input type="checkbox" value="oficio"> 📄 Oficio</label>
             </div>
             <div class="option">
-              <button class="download-single" data-type="recibo" title="Descargar Recibo">⬇️</button>
+              <button type="button" class="download-single" data-type="recibo">⬇️</button>
               <label class="menu-option"><input type="checkbox" value="recibo"> 💵 Recibo Anticipo</label>
             </div>
             <div class="option">
-              <button class="download-single" data-type="comprobacion" title="Descargar Comprobación">⬇️</button>
+              <button type="button" class="download-single" data-type="comprobacion">⬇️</button>
               <label class="menu-option"><input type="checkbox" value="comprobacion"> 📑 Comprobación</label>
             </div>
             <div class="option">
-              <button class="download-single" data-type="formato_unico" title="Descargar Formato Único">⬇️</button>
+              <button type="button" class="download-single" data-type="formato_unico">⬇️</button>
               <label class="menu-option"><input type="checkbox" value="formato_unico"> 🗂 Formato Único</label>
             </div>
             <div class="option">
-              <button class="download-single" data-type="alimentacion" title="Descargar Alimentación">⬇️</button>
+              <button type="button" class="download-single" data-type="alimentacion">⬇️</button>
               <label class="menu-option"><input type="checkbox" value="alimentacion"> 🍽 Alimentación</label>
             </div>
             <hr style="margin:6px 0;">
@@ -280,8 +412,101 @@ function onHist(res){
   });
 
   document.getElementById("page").textContent=(start/pageSize)+1;
+  // ✅ Listener de descargas individuales dentro de onHist
+  document.querySelectorAll(".download-single").forEach(btn => {
+    btn.onclick = (evt) => {
+      evt.stopPropagation();
+      evt.preventDefault();
+
+      const oficio = btn.closest(".dropdown-content")?.dataset.oficio;
+      const type = btn.dataset.type;
+
+      console.log("🎯 Click detectado:", { oficio, type });
+
+      if (!oficio || !type) {
+        alert("❌ No se pudo identificar el oficio o el tipo de documento.");
+        return;
+      }
+
+      showLoader(true, `Generando ${type.toUpperCase()}...`);
+
+      const cb = "cb_single_" + Date.now();
+      window[cb] = (res) => {
+        showLoader(false);
+        console.log("📥 Respuesta del servidor:", res);
+
+        if (!res || !res.success) {
+          alert("❌ Error al generar el documento: " + (res?.error || "desconocido"));
+          delete window[cb];
+          return;
+        }
+
+        const a = document.createElement("a");
+        a.href = res.url;
+        a.download = "";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        delete window[cb];
+      };
+
+      const script = document.createElement("script");
+      script.src = `${SCRIPT_GEN_URL}?oficio=${encodeURIComponent(oficio)}&type=${encodeURIComponent(type)}&callback=${cb}`;
+      console.log("📡 Inyectando JSONP:", script.src);
+      document.body.appendChild(script);
+    };
+  });
 }
 
+// ---------- UNICO LISTENER para descarga individual (funcional) ----------
+document.body.addEventListener("click", (evt) => {
+  const btn = evt.target.closest(".download-single");
+  if (!btn) return;
+
+  // bloqueamos la propagación para evitar cierres prematuros
+  evt.stopPropagation();
+  evt.preventDefault();
+
+  const dropdown = btn.closest(".dropdown-content");
+  const oficio = dropdown?.dataset.oficio;
+  const type = btn.dataset.type;
+
+  console.log("🎯 Click en descarga individual:", { oficio, type });
+
+  if (!oficio || !type) {
+    alert("No se pudo identificar el oficio o el tipo de documento.");
+    return;
+  }
+
+  showLoader(true, `Generando ${type.toUpperCase()}...`);
+
+  const cb = "cb_single_" + Date.now();
+  window[cb] = (res) => {
+    showLoader(false);
+    console.log("📥 Respuesta del servidor:", res);
+
+    if (!res || !res.success) {
+      alert("❌ Error al generar el documento: " + (res?.error || "desconocido"));
+      delete window[cb];
+      return;
+    }
+
+    const a = document.createElement("a");
+    a.href = res.url;
+    a.download = "";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    delete window[cb];
+  };
+
+  const script = document.createElement("script");
+  script.src = `${SCRIPT_GEN_URL}?oficio=${encodeURIComponent(oficio)}&type=${encodeURIComponent(type)}&callback=${cb}`;
+  console.log("📡 Inyectando JSONP:", script.src);
+  document.body.appendChild(script);
+});
+
+// función existente: formateo fechas
 function formatarFechas(f){
   if(!f) return "";
   if(f.includes(" a ")||f.includes(" al ")) return f; // ya es rango
@@ -389,39 +614,6 @@ function downloadSelected(btn, oficio){
   document.body.appendChild(s);
 }
 
-// 🔹 Descargar documento individual desde los iconos
-document.addEventListener('click', function (e) {
-  const btn = e.target.closest('.download-single');
-  if (!btn) return;
-
-  const type = btn.dataset.type;
-  const oficio = btn.closest('.dropdown-content')?.querySelector('.btn-combined')?.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
-
-  if (!oficio) return alert("No se encontró el número de oficio.");
-
-  showLoader(true, "Generando " + type + "...");
-
-  const cb = "cb_single_" + Date.now();
-  window[cb] = (res) => {
-    showLoader(false);
-    if (res.success) {
-      const a = document.createElement("a");
-      a.href = res.url;
-      a.download = "";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } else {
-      alert("❌ Error al generar: " + (res.error || "desconocido"));
-    }
-    delete window[cb];
-  };
-
-  const script = document.createElement("script");
-  script.src = `${SCRIPT_GEN_URL}?oficio=${encodeURIComponent(oficio)}&type=${encodeURIComponent(type)}&callback=${cb}`;
-  document.body.appendChild(script);
-});
-
 function goEdit(o){ location.href="edit.html?oficio="+encodeURIComponent(o); }
 
 // 🔹 Opcional: cuando tengamos ZIP funcionando
@@ -447,41 +639,55 @@ document.getElementById("filtroRein").onchange=function(){
   });
 }
 
-// Delegación: manejar click en los iconos de descarga individual
-document.addEventListener('click', function(evt){
-  const btn = evt.target.closest('.download-single');
-  if (!btn) return;
+// Esperar a que el DOM esté completamente cargado antes de registrar listeners
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("✅ DOM completamente cargado — listener de descarga activado");
 
-  // ubicamos el dropdown-content contenedor con data-oficio
-  const dropdown = btn.closest('.dropdown-content');
-  const oficio = dropdown ? dropdown.dataset.oficio : null;
-  const type = btn.dataset.type;
-  if (!oficio || !type) {
-    return alert("No se pudo identificar el oficio o el tipo.");
-  }
+  document.body.addEventListener("click", (evt) => {
+    const btn = evt.target.closest(".download-single");
+    if (!btn) return;
 
-  showLoader(true, "Generando " + type + "...");
+    evt.stopPropagation();
+    evt.preventDefault();
 
-  const cb = "cb_single_" + Date.now();
-  window[cb] = function(res){
-    showLoader(false);
-    if (res && res.success) {
+    const dropdown = btn.closest(".dropdown-content");
+    const oficio = dropdown?.dataset.oficio;
+    const type = btn.dataset.type;
+
+    console.log("🎯 Click detectado en descarga individual:", { oficio, type });
+
+    if (!oficio || !type) {
+      alert("No se pudo identificar el oficio o el tipo de documento.");
+      return;
+    }
+
+    showLoader(true, `Generando ${type.toUpperCase()}...`);
+
+    const cb = "cb_single_" + Date.now();
+    window[cb] = (res) => {
+      showLoader(false);
+      console.log("📥 Respuesta del servidor:", res);
+
+      if (!res || !res.success) {
+        alert("❌ Error al generar el documento: " + (res?.error || "desconocido"));
+        delete window[cb];
+        return;
+      }
+
       const a = document.createElement("a");
       a.href = res.url;
       a.download = "";
       document.body.appendChild(a);
       a.click();
       a.remove();
-    } else {
-      alert("Error al generar documento: " + (res && res.error ? res.error : "desconocido"));
-      console.error("single-error", res);
-    }
-    delete window[cb];
-  };
+      delete window[cb];
+    };
 
-  const script = document.createElement("script");
-  script.src = `${SCRIPT_GEN_URL}?oficio=${encodeURIComponent(oficio)}&type=${encodeURIComponent(type)}&callback=${cb}`;
-  document.body.appendChild(script);
+    const script = document.createElement("script");
+    script.src = `${SCRIPT_GEN_URL}?oficio=${encodeURIComponent(oficio)}&type=${encodeURIComponent(type)}&callback=${cb}`;
+    console.log("📡 Inyectando JSONP:", script.src);
+    document.body.appendChild(script);
+  });
 });
 
 loadPage();
@@ -490,6 +696,29 @@ function logout(){
   localStorage.removeItem("session");
   location.href="login.html";
 }
+
+// Mostrar/ocultar menú de descarga con clic en el botón 📥
+document.addEventListener("click", (e) => {
+  const button = e.target.closest(".btn-download");
+  const anyMenu = document.querySelector(".dropdown-content.show");
+
+  // Si hace clic fuera de cualquier menú, cerrar los que estén abiertos
+  if (!button && anyMenu && !e.target.closest(".dropdown-content")) {
+    anyMenu.classList.remove("show");
+    return;
+  }
+
+  // Si hace clic en el botón 📥, alternar visibilidad del menú asociado
+  if (button) {
+    const menu = button.parentElement.querySelector(".dropdown-content");
+    if (menu) {
+      const isOpen = menu.classList.contains("show");
+      document.querySelectorAll(".dropdown-content.show").forEach(m => m.classList.remove("show"));
+      if (!isOpen) menu.classList.add("show");
+    }
+  }
+});
+
 </script>
 <!-- LOADER DE PANTALLA COMPLETA -->
 <div id="loaderOverlay">
