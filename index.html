@@ -331,6 +331,12 @@ function ensureOficio(){
   return val.length>0;
 }
 
+// ===== Capturar usuario que guarda el oficio =====
+function getUsuarioActual() {
+  const s = JSON.parse(localStorage.getItem("session") || "{}");
+  return s?.nombre || s?.usuario || "Desconocido";
+}
+
 // ===== Guardar =====
 $('form').addEventListener('submit', async e=>{
   e.preventDefault();
@@ -344,6 +350,8 @@ $('form').addEventListener('submit', async e=>{
   fd.set("_method","create");
 
   fd.set('reintegro_deposito', $('reintegro').checked ? 'TRUE' : 'FALSE');
+
+  fd.set("capturado_por", getUsuarioActual());
 
   const r = await fetch(SCRIPT_URL, { method:"POST", body:fd });
   const j = await r.json().catch(()=>({}));
