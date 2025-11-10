@@ -318,6 +318,7 @@
 </div>
 
 <script>
+  const session = JSON.parse(localStorage.getItem("session") || "{}");
 checkSession();
 function checkSession(){
   const s=JSON.parse(localStorage.getItem("session")||"{}");
@@ -381,7 +382,10 @@ function onHist(res){
         <div class="dropdown">
           <button title="Descargar documentos" class="btn-download">📥</button>
           <div class="dropdown-content" data-oficio="${r[0]}" onclick="event.stopPropagation()">
-            <div class="dropdown-header">Oficio ${r[0]}</div>
+            <div class="dropdown-header">
+              Oficio ${r[0]}
+              ${JSON.parse(localStorage.getItem("session") || "{}").rol === "admin" ? `<div class="capturador">👤 ${r[8] || "Sin registrar"}</div>` : ""}
+            </div>
             <div class="option">
               <button type="button" class="download-single" data-type="oficio">⬇️</button>
               <label class="menu-option"><input type="checkbox" value="oficio"> 📄 Oficio</label>
