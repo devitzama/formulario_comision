@@ -1,122 +1,283 @@
-:root{
-  --accent:#8c0000; /* rojo institucional basado en tu logo */
-  --muted:#4a4a4a;
-  --bg:#f3f6f8;
+:root {
+  --accent: #8c0000; /* rojo institucional basado en tu logo */
+  --muted: #4a4a4a;
+  --bg: #f3f6f8;
 }
 
-body{
-  font-family:Inter,system-ui,Arial;
-  background:var(--bg);
-  margin:0;
-  padding:0;
-  color:#1d1d1d;
+/* === BASE === */
+body {
+  font-family: Inter, system-ui, Arial;
+  background: var(--bg);
+  margin: 0;
+  padding: 0;
+  color: #1d1d1d;
 }
 
 /* === BARRA INSTITUCIONAL === */
-.header-bar{
-  width:100%;
-  background:var(--accent);
-  color:#fff;
-  text-align:center;
-  padding:10px 0;
-  font-size:18px;
-  font-weight:700;
-  letter-spacing:0.5px;
+.header-bar {
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
-tr:nth-child(even){background:#fff5f5}
-/* === Tarjeta === */
-.card{
-  max-width:980px;
-  margin:20px auto;
-  background:#ffffffee; /* un poco transparente */
-  backdrop-filter:blur(6px);
-  padding:22px;
-  border-radius:12px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+/* === TABLAS Y TARJETAS === */
+tr:nth-child(even) { background: #fff5f5; }
+
+.card {
+  max-width: 980px;
+  margin: 20px auto;
+  background: #ffffffee; /* un poco transparente */
+  backdrop-filter: blur(6px);
+  padding: 22px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
-h1{
-  color:var(--accent);
-  text-align:center;
-  margin-bottom:8px;
+h1 {
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 8px;
 }
 
-/* === Logo === */
-.logo{
-  display:block;
-  width:130px;
-  margin:5px auto 18px auto;
+/* === LOGO === */
+.logo {
+  display: block;
+  width: 130px;
+  margin: 5px auto 18px auto;
 }
 
-/* === Form === */
-label{
-  display:block;font-weight:600;font-size:0.9rem;margin-top:8px;
-}
-.row{display:flex;gap:12px;flex-wrap:wrap}
-.col{flex:1;min-width:180px}
-input,select{
-  width:95%;
-  padding:9px;
-  border-radius:8px;
-  border:1px solid #dce3ec;
-  font-size:14px;
-}
-textarea{width:100%;padding:9px;border-radius:8px;border:1px solid #dce3ec}
-
-.section{margin-top:14px;padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef5fb}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-
-.totals{display:flex;gap:10px;align-items:center;margin-top:10px}
-.totals .box{
-  flex:1;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #e9f2fb;
-  text-align:center;
-  background:#f5dada;
-}
-.totals .box2{
-  flex:1;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #e9f2fb;
-  text-align:center;
-  background:#fff;
+/* === FORMULARIO === */
+label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 8px;
 }
 
-.actions{display:flex;gap:10px;margin-top:14px}
-button{
-  background:var(--accent);
-  color:#fff;
-  padding:10px 14px;
-  border-radius:8px;
-  border:0;
-  cursor:pointer;
-  font-size:15px;
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.col { flex: 1; min-width: 180px; }
+
+input, select {
+  width: 95%;
+  padding: 9px;
+  border-radius: 8px;
+  border: 1px solid #dce3ec;
+  font-size: 14px;
 }
-button.ghost{background:#6b7280}
 
-/* === Historial colores diferencia === */
-.diff-positive{color:green;font-weight:bold;}
-.diff-negative{color:red;font-weight:bold;}
-.diff-zero{color:blue;font-weight:bold;}
-.readonly{background:#f5dada}
+textarea {
+  width: 100%;
+  padding: 9px;
+  border-radius: 8px;
+  border: 1px solid #dce3ec;
+}
 
+.section {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fbfdff;
+  border: 1px solid #eef5fb;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.totals {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.totals .box {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e9f2fb;
+  text-align: center;
+  background: #f5dada;
+}
+
+.totals .box2 {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e9f2fb;
+  text-align: center;
+  background: #fff;
+}
+
+/* === BOTONES Y ACCIONES === */
+.actions { display: flex; gap: 10px; margin-top: 14px; }
+
+button {
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 0;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.2s ease;
+}
+
+button:hover { background: #a80000; }
+
+button.ghost {
+  background: #6b7280;
+}
+
+button.ghost:hover {
+  background: #4b5563;
+}
+
+/* === DIFERENCIAS POSITIVAS / NEGATIVAS === */
+.diff-positive { color: green; font-weight: bold; }
+.diff-negative { color: red; font-weight: bold; }
+.diff-zero { color: blue; font-weight: bold; }
+
+.readonly { background: #f5dada; }
+
+/* === CELDA DE DOCUMENTOS === */
 .docs-cell {
-  display:flex;
-  gap:6px;
-  justify-content:center;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
 }
 
 .doc-btn {
-  font-size:18px;
-  background:none;
-  border:none;
-  cursor:pointer;
-  transition:0.15s;
+  font-size: 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.15s;
 }
 
 .doc-btn:hover {
-  transform:scale(1.25);
+  transform: scale(1.25);
+}
+
+/* === MENÚ DE DESCARGA DE DOCUMENTOS === */
+.download-menu {
+  position: relative;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Contenedor del menú desplegable */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  min-width: 220px;
+  z-index: 9999; /* asegura que esté sobre la tabla */
+  text-align: left;
+  padding: 4px 0;
+}
+
+/* Mostrar el menú al pasar el mouse */
+.dropdown:hover .dropdown-content,
+.dropdown-content:hover {
+  display: block;
+}
+
+/* Botón principal del menú 📥 */
+.btn-download {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-download:hover {
+  background: #a80000;
+}
+
+/* Cada opción del menú */
+.dropdown-content .option {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 6px 10px;
+  transition: background 0.2s;
+}
+
+.dropdown-content .option:hover {
+  background: #f0f5fa;
+}
+
+/* Ícono de descarga individual ⬇️ */
+.download-single {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1em;
+  padding: 2px 6px;
+  line-height: 1;
+  color: #007bff;
+  transition: color 0.2s, transform 0.1s;
+}
+
+.download-single:hover {
+  color: #0056b3;
+  transform: scale(1.15);
+}
+
+/* Checkbox + texto alineados en una sola línea */
+.dropdown-content label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  color: #0b1823;
+}
+
+/* Checkbox */
+.dropdown-content input[type="checkbox"] {
+  transform: scale(1.05);
+  margin: 0;
+}
+
+/* Separador y botón combinado */
+.dropdown-content hr {
+  margin: 6px 0;
+  border: none;
+  border-top: 1px solid #e0e0e0;
+}
+
+.btn-combined {
+  width: 100%;
+  background: #006d3c;
+  color: #fff;
+  border: none;
+  border-radius: 0 0 8px 8px;
+  padding: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-combined:hover {
+  background: #00914e;
 }
