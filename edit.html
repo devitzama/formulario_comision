@@ -111,6 +111,17 @@
         </div>
       </div>
 
+      <div class="row">
+        <div class="col">
+          <label>Vo.Bo.</label>
+          <input id="vobo" name="vobo">
+        </div>
+        <div class="col">
+          <label>Puesto Vo.Bo.</label>
+          <input id="puestoVoBo" name="puesto_vobo">
+        </div>
+      </div>
+
       <div class="section">
         <strong>Anticipado</strong>
         <div class="grid" style="margin-top:8px">
@@ -263,6 +274,8 @@ function onDataEdit(data){
   $('placa').value = data.placa || '';
   $('autoriza').value = data.autoriza || '';
   $('puestoAutoriza').value = data.puesto_autoriza || '';
+  $('vobo').value = data.vobo || '';
+  $('puestoVoBo').value = data.puesto_vobo || '';
 
   // anticipados
   $('antAlim').value = data.alim_antic || 0;
