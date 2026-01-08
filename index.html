@@ -204,22 +204,26 @@
 
 <script>
 
-function checkSession(){
+const session = checkSession(["admin","editor"]);
+
+function checkSession(allowedRoles = []) {
   const s = JSON.parse(localStorage.getItem("session") || "{}");
-  if(!s.usuario || !s.rol || !s.exp) return location.href="login.html";
-  if(Date.now() > s.exp){
+
+  if (!s.usuario || !s.rol || Date.now() > s.exp) {
     localStorage.removeItem("session");
-    return location.href="login.html";
+    location.href = "login.html";
+    return null;
   }
+
+  if (allowedRoles.length && !allowedRoles.includes(s.rol)) {
+    alert("⛔ No tienes permisos para acceder a esta sección");
+    location.href = "historial.html";
+    return null;
+  }
+
+  return s;
 }
-checkSession();
-const ses = JSON.parse(localStorage.getItem("session"));
-if(ses.rol == "consulta"){
-  document.querySelectorAll('input,select,textarea').forEach(el=>{
-    if(el.id !== "salir") el.disabled = true;
-  });
-  document.querySelector('button[type="submit"]').disabled = true;
-}
+
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOB-68HNJbUPuwd1wDkPJDnrxPDAMWCsaOVFN8n6JIQWnXbqlwszOtJ3YQZIVzG3Dwvg/exec";
 const $ = id => document.getElementById(id);
 
