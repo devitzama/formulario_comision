@@ -170,6 +170,26 @@
     </form>
   </div>
 <script>
+
+const session = checkSession(["admin","editor","consulta"]);
+
+function checkSession(allowedRoles = []) {
+  const s = JSON.parse(localStorage.getItem("session") || "{}");
+
+  if (!s.usuario || !s.rol || Date.now() > s.exp) {
+    localStorage.removeItem("session");
+    location.href = "login.html";
+    return null;
+  }
+
+  if (allowedRoles.length && !allowedRoles.includes(s.rol)) {
+    alert("⛔ No tienes permisos para acceder a esta sección");
+    location.href = "historial.html";
+    return null;
+  }
+
+  return s;
+}
 /* ----------------- EDIT.HTML: script corregido ------------------
  
    Asegúrate de dejar intacto el HTML (inputs con los mismos IDs).
@@ -364,6 +384,10 @@ function updateTotalsAndDates(){
 
 /* submit (update) — se conserva tu flujo: se envía como URLSearchParams para evitar preflight */
 document.getElementById('form').addEventListener('submit', async function(e){
+  if (session.rol === "consulta") {
+    e.preventDefault();
+    alert("⛔ Este usuario no puede modificar información");
+  }
   e.preventDefault();
   const fm = new FormData(this);
   fm.set('_method','update');
@@ -402,6 +426,28 @@ $('medio').addEventListener('change', toggleVehiculo);
 
 /* inicio */
 loadRecordEdit();
+
+aplicarSoloLectura(session);
+
+function aplicarSoloLectura(session) {
+  if (session.rol !== "consulta") return;
+
+  // Bloquear todos los campos
+  document.querySelectorAll("input, textarea, select").forEach(el => {
+    el.setAttribute("readonly", true);
+    el.setAttribute("disabled", true);
+    el.classList.add("readonly");
+  });
+
+  // Desactivar botón guardar
+  const btn = document.querySelector("button[type='submit'], #guardar, .btn-guardar");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "🔒 Solo lectura";
+    btn.style.background = "#9ca3af";
+    btn.style.cursor = "not-allowed";
+  }
+}
 </script>
 </body>
 </html>
