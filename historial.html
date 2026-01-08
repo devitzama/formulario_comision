@@ -318,14 +318,25 @@
 </div>
 
 <script>
-  const session = JSON.parse(localStorage.getItem("session") || "{}");
-checkSession();
-function checkSession(){
-  const s=JSON.parse(localStorage.getItem("session")||"{}");
-  if(!s.usuario || !s.rol || Date.now()>s.exp){
+
+const session = checkSession(["admin","editor","consulta"]);
+
+function checkSession(allowedRoles = []) {
+  const s = JSON.parse(localStorage.getItem("session") || "{}");
+
+  if (!s.usuario || !s.rol || Date.now() > s.exp) {
     localStorage.removeItem("session");
-    location.href="login.html";
+    location.href = "login.html";
+    return null;
   }
+
+  if (allowedRoles.length && !allowedRoles.includes(s.rol)) {
+    alert("⛔ No tienes permisos para acceder a esta sección");
+    location.href = "historial.html";
+    return null;
+  }
+
+  return s;
 }
 
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyOB-68HNJbUPuwd1wDkPJDnrxPDAMWCsaOVFN8n6JIQWnXbqlwszOtJ3YQZIVzG3Dwvg/exec";
