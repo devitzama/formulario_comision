@@ -10,6 +10,10 @@
 <style>
     .card{max-width:380px;margin:100px auto;background:#fff;padding:20px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.08)}
    .error{color:#d00;font-size:13px;text-align:center;margin-top:10px}
+   .centrar-boton {
+    display: block;
+    margin: 0 auto;
+  }
 </style>
 </head>
 <body>
@@ -25,7 +29,7 @@
   <label>Contraseña</label>
   <input id="password" type="password" autocomplete="current-password">
 
-  <button onclick="login()">Ingresar</button>
+  <button class="centrar-boton" onclick="login()">Ingresar</button>
   <div id="msg" class="error"></div>
 </div>
 
