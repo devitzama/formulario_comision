@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resumen de Comisiones</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+body{
+  font-family: Inter,system-ui,Arial;
+  background: var(--bg);
+  margin:0;
+  padding:10px;
+}
+
+.table-container{
+    width:100%;
+    overflow-x:auto;
+    overflow-y:visible;
+}
+
+thead th{
+position:sticky;
+top:0;
+z-index:10;
+background:var(--accent);
+color:#fff;
+}
+thead tr:nth-child(2) th{
+top:38px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  min-width: 1400px;
+}
+
+th,td{
+  padding:8px;
+  border:1px solid #eef5fb;
+  text-align:center;
+  font-size:14px;
+}
+
+th{
+  background:var(--accent);
+  color:#fff;
+}
+
+tfoot{
+  font-weight:bold;
+  background:#f4f6f8;
+}
+
+.toolbar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+input,select{
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #e6eef6;
+}
+
+button{
+  padding:8px 12px;
+  border-radius:8px;
+  border:0;
+  background:var(--accent);
+  color:#fff;
+  cursor:pointer;
+}
+
+.card {
+    width: 95%;
+  max-width: 95%;
+  margin: 0;
+  background: #ffffffee; /* un poco transparente */
+  backdrop-filter: blur(6px);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.mes-separator{
+background:#e9f2fb;
+font-weight:bold;
+font-size:16px;
+text-align:left;
+}
+
+.mes-separator td{
+padding:10px;
+border-top:3px solid var(--accent);
+}
+
+.panel-filtros{
+margin:15px 0 20px 0;
+}
+
+.filtros{
+display:grid;
+grid-template-columns: repeat(4, 1fr);
+gap:15px;
+margin-bottom:12px;
+}
+
+.filtro{
+display:flex;
+flex-direction:column;
+}
+
+.filtro label{
+font-weight:600;
+font-size:14px;
+margin-bottom:4px;
+}
+
+.filtro input,
+.filtro select{
+padding:8px;
+border-radius:8px;
+border:1px solid #e6eef6;
+}
+
+.acciones{
+display:flex;
+justify-content:flex-end;
+gap:10px;
+}
+
+.acciones button{
+padding:8px 14px;
+border-radius:8px;
+border:0;
+background:var(--accent);
+color:#fff;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header-bar">
+SUBSECRETARÍA DE EDUCACIÓN BÁSICA – MICHOACÁN
+</div>
+
+<div class="card">
+
+<img src="logo.png" class="logo">
+
+<h1>Resumen de Comisiones</h1>
+
+<div class="panel-filtros">
+
+<div class="filtros">
+
+<div class="filtro">
+<label>Mes</label>
+<select id="filtroMes">
+<option value="">Todos los meses</option>
+</select>
+</div>
+
+<div class="filtro">
+<label>Nombre</label>
+<input type="text" id="filtroNombre" placeholder="Filtrar por nombre">
+</div>
+
+<div class="filtro">
+<label>Lugar</label>
+<input type="text" id="filtroLugar" placeholder="Filtrar por lugar">
+</div>
+
+<div class="filtro">
+<label>Reintegro / Depósito</label>
+<select id="filtroRD">
+<option value="">Todos</option>
+<option value="true">Reintegro</option>
+<option value="false">Depósito</option>
+</select>
+</div>
+
+</div>
+
+<div class="acciones">
+
+<button onclick="aplicarFiltros()">Filtrar</button>
+<button onclick="limpiarFiltros()">Limpiar</button>
+<button onclick="exportarExcel()">Exportar Excel</button>
+<button onclick="exportarPDF()">Exportar PDF</button>
+<button onclick="location.href='historial.html'">Volver</button>
+
+</div>
+
+</div>
+
+<div class="table-container">
+<table id="tabla">
+
+<thead>
+
+<tr>
+<th rowspan="2">Oficio</th>
+<th rowspan="2">Nombre</th>
+<th rowspan="2">Fechas comisión</th>
+<th rowspan="2">Lugar</th>
+
+<th rowspan="2">R/D</th>
+<th rowspan="2">Diferencia</th>
+
+<th colspan="7">Anticipado</th>
+<th colspan="7">Devengado</th>
+
+</tr>
+
+<tr>
+
+<th>Alim</th>
+<th>Hosp</th>
+<th>Comb</th>
+<th>Peaje</th>
+<th>Pasajes</th>
+<th>Otros</th>
+<th>Total</th>
+
+<th>Alim</th>
+<th>Hosp</th>
+<th>Comb</th>
+<th>Peaje</th>
+<th>Pasajes</th>
+<th>Otros</th>
+<th>Total</th>
+
+</tr>
+
+
+</thead>
+
+<tbody id="tablaBody"></tbody>
+
+<tfoot>
+
+<tr>
+
+<th colspan="5">Totales</th>
+
+<th id="t_dif"></th>
+
+<th id="t_alim_a"></th>
+<th id="t_hosp_a"></th>
+<th id="t_comb_a"></th>
+<th id="t_peaje_a"></th>
+<th id="t_pasajes_a"></th>
+<th id="t_otros_a"></th>
+<th id="t_total_a"></th>
+
+<th id="t_alim_d"></th>
+<th id="t_hosp_d"></th>
+<th id="t_comb_d"></th>
+<th id="t_peaje_d"></th>
+<th id="t_pasajes_d"></th>
+<th id="t_otros_d"></th>
+<th id="t_total_d"></th>
+
+</tr>
+
+</tfoot>
+
+<tbody id="tbody">
+  <tr><td colspan="10">Cargando...</td></tr>
+</tbody>
+
+</table>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.29/dist/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+
+    const session = checkSession(["admin","editor","consulta"]);
+
+function checkSession(allowedRoles = []) {
+  const s = JSON.parse(localStorage.getItem("session") || "{}");
+
+  if (!s.usuario || !s.rol || Date.now() > s.exp) {
+    localStorage.removeItem("session");
+    location.href = "login.html";
+    return null;
+  }
+
+  if (allowedRoles.length && !allowedRoles.includes(s.rol)) {
+    alert("⛔ No tienes permisos para acceder a esta sección");
+    location.href = "historial.html";
+    return null;
+  }
+
+  return s;
+}
+
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyOB-68HNJbUPuwd1wDkPJDnrxPDAMWCsaOVFN8n6JIQWnXbqlwszOtJ3YQZIVzG3Dwvg/exec";
+
+let datos=[];
+
+function cargarDatos(){
+
+const cb="cb_"+Date.now();
+
+window[cb]=(res)=>{
+
+if(!res.success){
+alert("Error al cargar datos");
+return;
+}
+
+datos=res.data;
+
+llenarMeses();
+
+renderTabla(datos);
+
+delete window[cb];
+
+};
+
+const s=document.createElement("script");
+s.src=`${SCRIPT_URL}?reporte=1&callback=${cb}`;
+document.body.appendChild(s);
+
+}
+
+function llenarMeses(){
+
+const meses=new Set();
+
+datos.forEach(r=>{
+if(r.mes) meses.add(r.mes);
+});
+
+const select=document.getElementById("filtroMes");
+
+meses.forEach(m=>{
+
+const o=document.createElement("option");
+o.value=m;
+o.textContent=m;
+
+select.appendChild(o);
+
+});
+
+}
+
+function aplicarFiltros(){
+
+const mes=document.getElementById("filtroMes").value;
+const nombre=document.getElementById("filtroNombre").value.toLowerCase();
+const lugar=document.getElementById("filtroLugar").value.toLowerCase();
+const rd=document.getElementById("filtroRD").value;
+
+const filtrado=datos.filter(r=>{
+
+if(mes && r.mes!==mes) return false;
+
+if(nombre && !r.nombre.toLowerCase().includes(nombre)) return false;
+
+if(lugar && !r.lugar.toLowerCase().includes(lugar)) return false;
+
+if(rd && String(r.reintegro_deposito)!==rd) return false;
+
+return true;
+
+});
+
+renderTabla(filtrado);
+
+}
+
+function formatearFecha(fecha){
+
+if(!fecha) return "";
+
+if(!fecha.includes("T")) return fecha;
+
+const d=new Date(fecha);
+
+return d.toLocaleDateString("es-MX",{
+day:"numeric",
+month:"long",
+year:"numeric"
+});
+
+}
+
+function renderTabla(data){
+
+    const tbody=document.getElementById("tbody");
+  tbody.innerHTML="";
+const tb=document.getElementById("tablaBody");
+
+tb.innerHTML="";
+
+let sum={
+alim_a:0,hosp_a:0,comb_a:0,peaje_a:0,pasajes_a:0,otros_a:0,total_a:0,
+alim_d:0,hosp_d:0,comb_d:0,peaje_d:0,pasajes_d:0,otros_d:0,total_d:0,
+dif:0
+};
+
+let mesActual="";
+
+data.forEach(r=>{
+    if(!document.getElementById("filtroMes").value){
+
+        if(r.mes!==mesActual){
+
+            mesActual=r.mes;
+
+            tb.innerHTML+=`
+            <tr class="mes-separator">
+            <td colspan="20">${mesActual}</td>
+            </tr>
+            `;
+
+        }       
+
+    }
+
+    let cls="diff-zero";
+
+if(r.total_dif>0) cls="diff-positive";
+else if(r.total_dif<0) cls="diff-negative";
+
+const fechaComision=formatearFecha(r.fechas_comision);
+
+const rd = r.reintegro_deposito ? "✅" : "❌";
+
+tb.innerHTML+=`
+
+<tr>
+
+<td>${r.oficio}</td>
+<td>${r.nombre}</td>
+<td>${fechaComision}</td>
+<td>${r.lugar}</td>
+
+<td>${rd}</td>
+<td class="${cls}">${r.total_dif.toFixed(2)}</td>
+
+<td>${r.alim_antic.toFixed(2)}</td>
+<td>${r.hosp_antic.toFixed(2)}</td>
+<td>${r.comb_antic.toFixed(2)}</td>
+<td>${r.peaje_antic.toFixed(2)}</td>
+<td>${r.pasajes_antic.toFixed(2)}</td>
+<td>${r.otros_antic.toFixed(2)}</td>
+
+<td>${r.total_antic.toFixed(2)}</td>
+
+<td>${r.alim_dev.toFixed(2)}</td>
+<td>${r.hosp_dev.toFixed(2)}</td>
+<td>${r.comb_dev.toFixed(2)}</td>
+<td>${r.peaje_dev.toFixed(2)}</td>
+<td>${r.pasajes_dev.toFixed(2)}</td>
+<td>${r.otros_dev.toFixed(2)}</td>
+
+<td>${r.total_dev.toFixed(2)}</td>
+
+</tr>
+
+`;
+
+sum.alim_a+=r.alim_antic;
+sum.hosp_a+=r.hosp_antic;
+sum.comb_a+=r.comb_antic;
+sum.peaje_a+=r.peaje_antic;
+sum.pasajes_a+=r.pasajes_antic;
+sum.otros_a+=r.otros_antic;
+sum.total_a+=r.total_antic;
+
+sum.alim_d+=r.alim_dev;
+sum.hosp_d+=r.hosp_dev;
+sum.comb_d+=r.comb_dev;
+sum.peaje_d+=r.peaje_dev;
+sum.pasajes_d+=r.pasajes_dev;
+sum.otros_d+=r.otros_dev;
+sum.total_d+=r.total_dev;
+
+if(!r.reintegro_deposito){
+sum.dif += r.total_dif;
+}
+
+});
+
+document.getElementById("t_alim_a").textContent=sum.alim_a.toFixed(2);
+document.getElementById("t_hosp_a").textContent=sum.hosp_a.toFixed(2);
+document.getElementById("t_comb_a").textContent=sum.comb_a.toFixed(2);
+document.getElementById("t_peaje_a").textContent=sum.peaje_a.toFixed(2);
+document.getElementById("t_pasajes_a").textContent=sum.pasajes_a.toFixed(2);
+document.getElementById("t_otros_a").textContent=sum.otros_a.toFixed(2);
+document.getElementById("t_total_a").textContent=sum.total_a.toFixed(2);
+
+document.getElementById("t_alim_d").textContent=sum.alim_d.toFixed(2);
+document.getElementById("t_hosp_d").textContent=sum.hosp_d.toFixed(2);
+document.getElementById("t_comb_d").textContent=sum.comb_d.toFixed(2);
+document.getElementById("t_peaje_d").textContent=sum.peaje_d.toFixed(2);
+document.getElementById("t_pasajes_d").textContent=sum.pasajes_d.toFixed(2);
+document.getElementById("t_otros_d").textContent=sum.otros_d.toFixed(2);
+document.getElementById("t_total_d").textContent=sum.total_d.toFixed(2);
+
+document.getElementById("t_dif").textContent=sum.dif.toFixed(2);
+
+}
+
+function exportarExcel(){
+
+const tabla = document.getElementById("tabla");
+
+const wb = XLSX.utils.table_to_book(tabla, {
+sheet:"Resumen"
+});
+
+XLSX.writeFile(wb,"reporte_comisiones.xlsx");
+
+}
+
+function exportarPDF(){
+
+const { jsPDF } = window.jspdf;
+
+const doc = new jsPDF({
+orientation:"landscape",
+unit:"pt",
+format:"a4"
+});
+
+const pageWidth = doc.internal.pageSize.getWidth();
+
+const fecha = new Date().toLocaleDateString("es-MX",{
+day:"numeric",
+month:"long",
+year:"numeric"
+});
+
+/* ---------- ENCABEZADO ---------- */
+
+doc.setFontSize(14);
+doc.text("SUBSECRETARÍA DE EDUCACIÓN BÁSICA", pageWidth/2, 30, {align:"center"});
+
+doc.setFontSize(12);
+doc.text("Resumen de Comisiones", pageWidth/2, 50, {align:"center"});
+
+doc.setFontSize(9);
+doc.text("Fecha de generación: " + fecha, pageWidth - 40, 30, {align:"right"});
+
+/* ---------- TABLA ---------- */
+
+doc.autoTable({
+html:"#tabla",
+
+startY:70,
+
+theme:"grid",
+
+styles:{
+fontSize:7,
+cellPadding:3
+},
+
+headStyles:{
+fillColor:[41,128,185],
+textColor:255,
+halign:"center"
+},
+
+bodyStyles:{
+halign:"center"
+},
+
+didDrawPage:function(data){
+
+/* footer */
+
+let pageNumber = doc.internal.getNumberOfPages();
+
+doc.setFontSize(8);
+
+doc.text(
+"Página " + pageNumber,
+pageWidth - 40,
+doc.internal.pageSize.height - 10,
+{align:"right"}
+);
+
+}
+
+});
+
+doc.save("reporte_comisiones.pdf");
+
+}
+
+function limpiarFiltros(){
+document.getElementById("filtroMes").value="";
+document.getElementById("filtroNombre").value="";
+document.getElementById("filtroLugar").value="";
+document.getElementById("filtroRD").value="";
+renderTabla(datos);
+}
+
+cargarDatos();
+
+</script>
+
+</body>
+</html>
